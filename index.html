@@ -349,11 +349,13 @@
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHW4_h-wk9AxHYhL7IbSRCgLbq7f3qMLkCvyy3bg5ZfHhwKnlsqdiG8GIBNs9x1PAohA/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2dNeo6UUzC0rVNEei5V6nqG8v9eIBnu3lD6EZaur4jiZDmuC6h6GR1cFroJfcaoyc/exec";
+    const CACHE_KEY = "GLORIA_CHOIR_SONGS_CACHE";
 
     let songs = [];
     let isDataLoaded = false;
-    let currentPart = null;
+    // 기본 파트를 'all'(합창)로 미리 지정하여 클릭 대기 시간 단축
+    let currentPart = 'all';
 
     const PART_THEMES = {
       all: {
@@ -394,38 +396,75 @@
     };
 
     window.addEventListener('DOMContentLoaded', () => {
+      // 1. 브라우저 캐시에 저장된 찬양 목록이 있는지 확인 후 즉시 화면에 표시
+      loadFromCache();
+      
       lucide.createIcons();
       updatePartTabUI();
-      renderInitialGuide();
+      
+      // 2. 캐시가 없으면 로딩 화면 표시 후 네트워크 조회
+      if (!songs || songs.length === 0) {
+        showLoadingUI();
+      }
       fetchSongs();
     });
 
-    async function fetchSongs() {
+    function loadFromCache() {
       try {
-        const res = await fetch(SCRIPT_URL);
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+          songs = JSON.parse(cached);
+          isDataLoaded = true;
+          renderSongList();
+        }
+      } catch (e) {
+        console.warn("캐시 로드 실패", e);
+      }
+    }
+
+    async function fetchSongs() {
+      // 6초 이상 응답 없을 시 타임아웃 처리
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+      try {
+        const res = await fetch(SCRIPT_URL, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
         const data = await res.json();
         songs = Array.isArray(data) ? data : [];
         isDataLoaded = true;
-        if (currentPart) {
-          renderSongList();
-        }
+        
+        // 최신 데이터 로컬스토리지에 보관 (다음 접속 시 즉시 로딩용)
+        localStorage.setItem(CACHE_KEY, JSON.stringify(songs));
+        renderSongList();
       } catch (err) {
         console.error(err);
         isDataLoaded = true;
-        if (currentPart) {
-          renderError("찬양곡 목록을 불러오는 중 오류가 발생했습니다.");
+        // 캐시 데이터도 없고 통신이 지연/실패된 경우 빈 목록 또는 에러 안내
+        if (!songs || songs.length === 0) {
+          renderEmptyList("등록된 찬양곡이 없거나 불러오는 데 지연되고 있습니다.");
         }
       }
     }
 
-    function renderInitialGuide() {
+    function showLoadingUI() {
       const container = document.getElementById('songList');
       container.innerHTML = `
-        <div class="py-8 px-4 text-center text-slate-500">
-          <p class="text-xs sm:text-sm font-medium flex items-center justify-center gap-1.5">
-            <i data-lucide="hand-metal" class="w-4 h-4 text-indigo-500"></i>
-            <span>위에서 연습하실 <strong>파트(합창·소프·알토·테너·베이스)</strong>를 선택해 주세요.</span>
-          </p>
+        <div class="py-12 text-center text-slate-400">
+          <i data-lucide="loader-2" class="w-6 h-6 mx-auto mb-2 animate-spin text-indigo-500"></i>
+          <p class="text-xs sm:text-sm font-medium">찬양곡 목록을 확인하고 있습니다...</p>
+        </div>
+      `;
+      lucide.createIcons();
+    }
+
+    function renderEmptyList(msg) {
+      const container = document.getElementById('songList');
+      container.innerHTML = `
+        <div class="py-10 px-4 text-center text-slate-400">
+          <i data-lucide="music" class="w-8 h-8 mx-auto mb-2 opacity-25"></i>
+          <p class="text-xs sm:text-sm font-medium">${msg || '등록된 찬양곡이 없습니다.'}</p>
         </div>
       `;
       lucide.createIcons();
@@ -434,9 +473,9 @@
     function renderError(message) {
       const container = document.getElementById('songList');
       container.innerHTML = `
-        <div class="py-12 px-4 text-center text-rose-500">
-          <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-2 text-rose-400"></i>
-          <p class="text-sm font-semibold">${message}</p>
+        <div class="py-10 px-4 text-center text-rose-500">
+          <i data-lucide="alert-circle" class="w-7 h-7 mx-auto mb-2 text-rose-400"></i>
+          <p class="text-xs sm:text-sm font-semibold">${message}</p>
         </div>
       `;
       lucide.createIcons();
@@ -446,15 +485,8 @@
       currentPart = part;
       updatePartTabUI();
       
-      if (!isDataLoaded) {
-        const container = document.getElementById('songList');
-        container.innerHTML = `
-          <div class="py-14 text-center text-slate-400">
-            <i data-lucide="loader-2" class="w-7 h-7 mx-auto mb-2 animate-spin text-indigo-500"></i>
-            <p class="text-sm font-medium">찬양곡 목록을 불러오는 중...</p>
-          </div>
-        `;
-        lucide.createIcons();
+      if (!isDataLoaded && (!songs || songs.length === 0)) {
+        showLoadingUI();
       } else {
         renderSongList();
       }
@@ -504,13 +536,7 @@
       const sortedSongs = [...songs].sort((a, b) => new Date(b.date) - new Date(a.date));
 
       if (sortedSongs.length === 0) {
-        container.innerHTML = `
-          <div class="py-14 text-center text-slate-400">
-            <i data-lucide="music" class="w-8 h-8 mx-auto mb-2 opacity-20"></i>
-            <p class="text-sm font-medium">등록된 찬양곡이 없습니다.</p>
-          </div>
-        `;
-        lucide.createIcons();
+        renderEmptyList('등록된 찬양곡이 없습니다.');
         return;
       }
 
@@ -653,6 +679,9 @@
         });
 
         songs.push(newSong);
+        // 저장 후 캐시도 함께 업데이트
+        localStorage.setItem(CACHE_KEY, JSON.stringify(songs));
+        
         if (currentPart) {
           renderSongList();
         }
