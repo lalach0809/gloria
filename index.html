@@ -354,7 +354,6 @@
 
     let songs = [];
     let isDataLoaded = false;
-    // 기본 파트를 'all'(합창)로 미리 지정하여 클릭 대기 시간 단축
     let currentPart = 'all';
 
     const PART_THEMES = {
@@ -396,13 +395,10 @@
     };
 
     window.addEventListener('DOMContentLoaded', () => {
-      // 1. 브라우저 캐시에 저장된 찬양 목록이 있는지 확인 후 즉시 화면에 표시
       loadFromCache();
-      
       lucide.createIcons();
       updatePartTabUI();
       
-      // 2. 캐시가 없으면 로딩 화면 표시 후 네트워크 조회
       if (!songs || songs.length === 0) {
         showLoadingUI();
       }
@@ -423,7 +419,6 @@
     }
 
     async function fetchSongs() {
-      // 6초 이상 응답 없을 시 타임아웃 처리
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 6000);
 
@@ -435,13 +430,11 @@
         songs = Array.isArray(data) ? data : [];
         isDataLoaded = true;
         
-        // 최신 데이터 로컬스토리지에 보관 (다음 접속 시 즉시 로딩용)
         localStorage.setItem(CACHE_KEY, JSON.stringify(songs));
         renderSongList();
       } catch (err) {
         console.error(err);
         isDataLoaded = true;
-        // 캐시 데이터도 없고 통신이 지연/실패된 경우 빈 목록 또는 에러 안내
         if (!songs || songs.length === 0) {
           renderEmptyList("등록된 찬양곡이 없거나 불러오는 데 지연되고 있습니다.");
         }
@@ -512,12 +505,16 @@
       const song = songs.find(s => String(s.id) === String(songId));
       if (song) {
         if (!song.views || typeof song.views !== 'object') {
-          song.views = { all: 0, soprano: 0, alto: 0, tenor: 0, bass: 0 };
+          let initVal = typeof song.views === 'number' ? song.views : 0;
+          song.views = { all: initVal, soprano: 0, alto: 0, tenor: 0, bass: 0 };
         }
-        song.views[part] = (song.views[part] || 0) + 1;
+        song.views[part] = (Number(song.views[part]) || 0) + 1;
         
         const viewEl = document.getElementById(`views-${songId}`);
         if (viewEl) viewEl.textContent = song.views[part];
+
+        // 변경된 카운트를 로컬 캐시에도 동기화
+        localStorage.setItem(CACHE_KEY, JSON.stringify(songs));
       }
 
       fetch(SCRIPT_URL, {
@@ -544,12 +541,30 @@
         const link = song.links ? song.links[currentPart] : '';
         const hasLink = link && link.trim() !== '';
         
+        // --- 조회수 안전 파싱 로직 ---
         let viewCount = 0;
-        if (song.views && typeof song.views !== 'object') {
-          viewCount = song.views[currentPart] || 0;
-        } else if (typeof song.views === 'number') {
-          viewCount = song.views;
+        let viewsObj = song.views;
+
+        // 시트에서 JSON 문자열로 넘어온 경우 객체로 파싱
+        if (typeof viewsObj === 'string') {
+          try {
+            viewsObj = JSON.parse(viewsObj);
+          } catch (e) {
+            if (!isNaN(viewsObj)) {
+              viewsObj = Number(viewsObj);
+            }
+          }
         }
+
+        // 1) 파트별 객체 형태인 경우
+        if (viewsObj && typeof viewsObj === 'object' && !Array.isArray(viewsObj)) {
+          viewCount = Number(viewsObj[currentPart]) || 0;
+        } 
+        // 2) 단일 숫자인 경우
+        else if (typeof viewsObj === 'number') {
+          viewCount = viewsObj;
+        }
+        // ------------------------------
 
         if (hasLink) {
           return `
@@ -679,7 +694,6 @@
         });
 
         songs.push(newSong);
-        // 저장 후 캐시도 함께 업데이트
         localStorage.setItem(CACHE_KEY, JSON.stringify(songs));
         
         if (currentPart) {
