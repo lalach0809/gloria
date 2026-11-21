@@ -3,729 +3,3397 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>로뎀교회 글로리아성가대 연습실</title>
-  <!-- Tailwind CSS CDN -->
+  <title>구글 시트 연동 도서 계층 및 노션 슬라이드 뷰어</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
   <style>
-    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-    
-    * {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-      -webkit-tap-highlight-color: transparent;
+    body {
+      font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      touch-action: manipulation;
     }
-    
-    .mesh-gradient {
-      background: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
-                  radial-gradient(at 100% 0%, rgba(236, 72, 153, 0.06) 0px, transparent 50%),
-                  radial-gradient(at 50% 100%, rgba(241, 245, 249, 1) 0px, transparent 50%);
-    }
-
-    .glass-header {
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    
-    .glass-card {
-      background: rgba(255, 255, 255, 0.96);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-    }
-
     .custom-scrollbar::-webkit-scrollbar {
       width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background-color: #cbd5e1;
-      border-radius: 9999px;
+      background: #d6d1c7;
+      border-radius: 4px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background-color: #94a3b8;
+      background: #b8b2a6;
+    }
+
+    /* 독서 가독성을 높이는 웜 페이퍼 슬라이드 배경 디자인 */
+    .book-slide-card {
+      background-color: #fdfbf7;
+      background-image: 
+        radial-gradient(at 100% 0%, rgba(245, 240, 230, 0.7) 0px, transparent 50%),
+        radial-gradient(at 0% 100%, rgba(242, 237, 226, 0.7) 0px, transparent 50%),
+        linear-gradient(to right, rgba(180, 170, 155, 0.08) 0%, rgba(253, 251, 247, 0) 3%, rgba(253, 251, 247, 0) 97%, rgba(180, 170, 155, 0.06) 100%);
+      border: 1px solid #e6e0d4;
+      box-shadow: 
+        0 10px 25px -5px rgba(60, 50, 35, 0.08),
+        0 4px 10px -2px rgba(60, 50, 35, 0.04),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    /* 음성 읽기(TTS) 현재 낭독 라인 강조 스타일 */
+    .tts-line-block {
+      border-radius: 6px;
+      transition: background-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .tts-active-line {
+      background-color: rgba(253, 224, 71, 0.42) !important;
+      box-shadow: -4px 0 0 0 #d97706, 4px 0 0 0 rgba(253, 224, 71, 0.42);
+      border-radius: 4px;
+    }
+
+    /* 슬라이드 본문 타이포그래피 최적화 */
+    #slideContent {
+      color: #292524; /* 순흑색 대신 눈이 편안한 딥 차콜 */
+      letter-spacing: -0.015em;
+      word-break: keep-all;
+    }
+    
+    .notion-h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #5b21b6;
+      line-height: 1.4;
+      margin-top: 1.1rem;
+      margin-bottom: 0.6rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 1.5px solid #e5dec9;
+    }
+    .notion-h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1e40af;
+      line-height: 1.45;
+      margin-top: 1rem;
+      margin-bottom: 0.45rem;
+    }
+    .notion-h3 {
+      font-size: 1.02rem;
+      font-weight: 600;
+      color: #0f766e;
+      line-height: 1.5;
+      margin-top: 0.85rem;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .notion-h3::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 13px;
+      background-color: #0d9488;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .notion-callout {
+      background-color: #f4efe6;
+      border: 1px solid #e4dccb;
+      border-left: 4px solid #059669;
+      border-radius: 10px;
+      padding: 10px 14px;
+      margin: 10px 0;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+    }
+    .notion-quote {
+      background-color: #f7f3eb;
+      border-left: 3.5px solid #8c7f6a;
+      border-radius: 0 8px 8px 0;
+      padding: 8px 14px;
+      color: #44403c;
+      font-style: italic;
+      margin: 8px 0;
+    }
+    .notion-code {
+      background-color: #292524;
+      color: #f5f5f4;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.84em;
+      line-height: 1.55;
+      overflow-x: auto;
+      margin: 8px 0;
+    }
+    .notion-inline-code {
+      background-color: #efe9dc;
+      color: #be123c;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      padding: 1.5px 5px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+    .notion-hr {
+      border: 0;
+      height: 1px;
+      background-color: #e4dccb;
+      margin: 1rem 0;
+    }
+    .notion-highlight {
+      background-color: #fde68a;
+      color: #1c1917;
+      padding: 1px 4px;
+      border-radius: 3px;
+    }
+
+    @media (max-width: 1024px) {
+      #slideContent {
+        font-size: 1.15rem !important;
+        line-height: 1.8 !important;
+      }
+      #slideContent .notion-h1 {
+        font-size: 1.9rem !important;
+        line-height: 1.38 !important;
+      }
+      #slideContent .notion-h2 {
+        font-size: 1.65rem !important;
+        line-height: 1.42 !important;
+      }
+      #slideContent .notion-h3 {
+        font-size: 1.45rem !important;
+        line-height: 1.48 !important;
+      }
+      #slideContent .notion-callout,
+      #slideContent .notion-quote {
+        font-size: 1.12rem !important;
+        line-height: 1.7 !important;
+      }
+      #slideContent .notion-code {
+        font-size: 1.0rem !important;
+      }
+      #slideContent .notion-inline-code {
+        font-size: 1.05rem !important;
+      }
+      #slideTitle {
+        font-size: 1.15rem !important;
+        line-height: 1.4 !important;
+      }
+      #currentHeadingTitle {
+        font-size: 1.35rem !important;
+      }
     }
   </style>
 </head>
-<body class="bg-slate-50 mesh-gradient text-slate-800 min-h-screen pb-16 antialiased selection:bg-indigo-500 selection:text-white">
+<body class="bg-[#efece6] text-stone-800 h-screen flex flex-col overflow-hidden select-none md:select-auto">
 
-  <!-- Header -->
-  <header class="glass-header border-b border-slate-200/80 sticky top-0 z-30 transition-all duration-200">
-    <div class="max-w-2xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center text-white shadow-md shadow-indigo-200">
-          <i data-lucide="music-2" class="w-5 h-5"></i>
-        </div>
-        <div>
-          <span class="text-[11px] font-bold tracking-wider text-indigo-600 uppercase block -mb-0.5">Gloria Choir</span>
-          <h1 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
-            당진로뎀교회 글로리아성가대
-          </h1>
-        </div>
+  <!-- 2열 분리 상단 헤더 -->
+  <header class="bg-[#faf8f5] border-b border-[#e2dcd0] px-3 py-2 flex flex-col gap-2 shadow-xs z-30 flex-shrink-0">
+    
+    <!-- 1열: 분류체계 선택 + 워크시트(도서) 선택 + 도서 통합 검색 버튼 -->
+    <div class="flex items-center gap-1.5 w-full">
+      <button onclick="toggleMobileSidebar()" class="lg:hidden p-1.5 text-stone-600 hover:bg-stone-200/60 rounded-lg transition flex-shrink-0" title="목차 열기">
+        <i class="fa-solid fa-bars text-base"></i>
+      </button>
+
+      <div class="bg-emerald-700 text-white w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center shadow-xs flex-shrink-0">
+        <i class="fa-solid fa-book-open-reader text-xs sm:text-sm"></i>
       </div>
 
-      <button 
-        onclick="openSongModal()" 
-        class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white text-xs sm:text-sm font-semibold rounded-xl shadow-sm hover:shadow-md hover:shadow-indigo-200/50 active:scale-95 transition-all duration-150"
-      >
-        <i data-lucide="plus-circle" class="w-4 h-4"></i>
-        <span>곡 등록</span>
+      <!-- 1단계: 도서 분류체계 (도서 권수 포함) -->
+      <div class="relative w-40 sm:w-44 md:w-48 flex-shrink-0">
+        <select id="genreSelectDropdown" onchange="onGenreChange(this.value)" class="w-full bg-indigo-50/80 hover:bg-indigo-100 border border-indigo-200 font-bold text-xs text-indigo-950 rounded-lg px-2 py-1.5 pr-4 focus:outline-none focus:ring-1 focus:ring-indigo-400 cursor-pointer truncate shadow-xs">
+          <option value="">📁 분야 선택</option>
+        </select>
+      </div>
+
+      <!-- 2단계: 도서 선택 -->
+      <div class="relative flex-1 min-w-0">
+        <select id="bookSelectDropdown" onchange="onBookChange(this.value)" disabled class="w-full bg-white hover:bg-stone-50 border border-stone-300 font-bold text-xs sm:text-sm text-stone-900 rounded-lg px-2.5 py-1.5 pr-6 focus:outline-none focus:ring-1 focus:ring-emerald-600 cursor-pointer truncate shadow-xs disabled:opacity-60 disabled:cursor-not-allowed">
+          <option value="">먼저 분야를 선택해주세요</option>
+        </select>
+      </div>
+
+      <!-- 도서 검색 퀵 버튼 -->
+      <button onclick="openBookSearchModal()" class="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg text-xs font-bold transition flex items-center gap-1 flex-shrink-0 shadow-xs" title="도서 전체 검색">
+        <i class="fa-solid fa-magnifying-glass text-[11px]"></i>
+        <span class="hidden sm:inline">도서 검색</span>
       </button>
+
+      <!-- 동기화 상태 배지 -->
+      <span id="syncStatusBadge" class="hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded bg-stone-200/70 text-stone-600 font-semibold flex-shrink-0">
+        대기
+      </span>
+    </div>
+
+    <!-- 2열: 저자/완독 현황 및 기능 버튼들 -->
+    <div class="flex items-center justify-between gap-1.5 w-full">
+      <div class="flex items-center gap-1.5 text-[11px] text-stone-500 font-medium min-w-0 flex-1 truncate pr-1">
+        <span id="bookAuthorDisplay" class="truncate max-w-[100px] sm:max-w-[150px]">
+          <i class="fa-solid fa-user-pen mr-0.5 text-stone-400"></i>저자
+        </span>
+        <span class="text-stone-300">•</span>
+        <span id="readingProgressDisplay" class="text-emerald-800 font-bold bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 truncate">
+          <i class="fa-solid fa-circle-check mr-0.5 text-emerald-600"></i>0% 완독
+        </span>
+      </div>
+
+      <div class="flex items-center gap-1 flex-shrink-0">
+        <button onclick="handleUserAuthClick()" id="btnUserLoginToggle" class="px-2 py-1 text-[11px] font-bold rounded-lg border transition flex items-center gap-1 bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 shadow-xs" title="회원 로그인/로그아웃">
+          <i class="fa-solid fa-user text-[10px]"></i>
+          <span id="userLoginText">로그인</span>
+        </button>
+
+        <button onclick="goToBookmark()" id="btnGoBookmark" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-[11px] font-bold rounded-lg transition flex items-center gap-1 shadow-xs" title="자동 저장된 직전 책갈피로 이동">
+          <i class="fa-solid fa-bookmark text-amber-600 text-xs"></i>
+          <span class="hidden sm:inline">책갈피</span>
+        </button>
+
+        <button onclick="resetBookProgress()" id="btnResetProgress" class="p-1.5 sm:px-2 sm:py-1 bg-white hover:bg-rose-50 text-stone-600 hover:text-rose-600 border border-stone-200 hover:border-rose-200 text-[11px] font-semibold rounded-lg transition flex items-center gap-1" title="완독 기록 초기화">
+          <i class="fa-solid fa-rotate-left text-xs"></i>
+          <span class="hidden md:inline">초기화</span>
+        </button>
+
+        <button onclick="reloadCurrentBookData()" class="p-1.5 sm:px-2 sm:py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-semibold rounded-lg transition" title="새로고침 (캐시 갱신)">
+          <i class="fa-solid fa-arrows-rotate text-xs" id="refreshIcon"></i>
+        </button>
+
+        <button onclick="openAddDataModal()" id="btnHeaderAddSlide" class="hidden px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-lg shadow-xs transition items-center gap-1" title="새 슬라이드 등록">
+          <i class="fa-solid fa-plus text-xs"></i>
+          <span class="hidden sm:inline">등록</span>
+        </button>
+
+        <button onclick="toggleAdminAuth()" id="btnAdminToggle" class="p-1.5 sm:px-2 sm:py-1 text-[11px] font-semibold rounded-lg border transition flex items-center gap-1 bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200" title="관리자 로그인">
+          <i id="adminLockIcon" class="fa-solid fa-lock text-[10px]"></i>
+          <span id="adminToggleText" class="hidden sm:inline">관리자</span>
+        </button>
+
+        <button onclick="openApiSettingModal()" class="p-1.5 text-stone-400 hover:text-stone-700 hover:bg-stone-200/60 rounded-lg transition" title="설정">
+          <i class="fa-solid fa-gear text-xs"></i>
+        </button>
+      </div>
     </div>
   </header>
 
-  <!-- Main Container -->
-  <main class="max-w-2xl mx-auto px-4 sm:px-6 py-5 space-y-4">
+  <!-- 진행률 바 -->
+  <div class="w-full bg-[#e2dcd0] h-1 flex-shrink-0">
+    <div id="readingProgressBar" class="bg-emerald-600 h-full transition-all duration-300" style="width: 0%"></div>
+  </div>
 
-    <!-- 1. 찬양의 고백 글귀 -->
-    <div class="glass-card rounded-3xl border border-slate-200/80 p-5 text-center shadow-sm">
-      <div class="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 mb-2 shadow-xs">
-        <i data-lucide="book-open" class="w-5 h-5"></i>
-      </div>
-      <span class="text-[10px] font-bold text-indigo-600 tracking-wider uppercase block mb-0.5">Praise & Worship</span>
-      <h2 class="text-sm sm:text-base font-bold text-slate-800 mb-2.5">찬양의 고백</h2>
+  <!-- 메인 레이아웃 -->
+  <div class="flex-1 flex overflow-hidden relative">
+    <div id="mobileBackdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-40 hidden lg:hidden transition-opacity"></div>
+
+    <!-- 좌측 목차 트리 사이드바 -->
+    <aside id="mainSidebar" class="fixed lg:static inset-y-0 left-0 w-[85vw] sm:w-[420px] md:w-[480px] lg:w-[500px] bg-[#faf8f5] border-r border-[#e2dcd0] flex flex-col z-50 lg:z-10 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out flex-shrink-0">
       
-      <div class="max-w-md mx-auto bg-slate-50/80 border border-slate-200/70 rounded-2xl p-4 shadow-xs">
-        <p class="text-xs sm:text-sm font-serif italic text-slate-700 leading-relaxed break-keep">
-          "내가 평생토록 여호와께 노래하며<br>
-          내가 살아 있는 동안 내 하나님을 찬양하리로다"
-        </p>
-        <p class="text-[11px] font-bold text-indigo-600 mt-2 tracking-wide">
-          — 시편 104편 33절 —
-        </p>
+      <!-- 상단 컨트롤 영역 -->
+      <div class="p-3 border-b border-[#e2dcd0] bg-[#f4f1ea] space-y-2 flex-shrink-0">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-stone-800">
+            <i class="fa-solid fa-folder-tree text-emerald-700"></i>
+            <span>도서 목차 구조</span>
+          </div>
+          <div class="flex items-center gap-1 text-[11px]">
+            <button onclick="toggleAllNodes(false)" class="px-2 py-0.5 bg-white border border-stone-200 hover:bg-stone-100 text-stone-600 rounded font-medium shadow-2xs">전체 펼치기</button>
+            <button onclick="toggleAllNodes(true)" class="px-2 py-0.5 bg-white border border-stone-200 hover:bg-stone-100 text-stone-600 rounded font-medium shadow-2xs">전체 접기</button>
+            <button onclick="toggleMobileSidebar()" class="lg:hidden p-1 text-stone-400 hover:text-stone-700 ml-0.5">
+              <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="relative">
+          <input type="text" id="treeSearchInput" oninput="filterTreeSearch(this.value)" placeholder="현재 도서 내 목차/본문 검색..." class="w-full bg-white border border-stone-200 rounded-lg pl-7 pr-3 py-1.5 text-xs focus:ring-1 focus:ring-emerald-600 focus:outline-none">
+          <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-[11px] text-stone-400"></i>
+        </div>
+      </div>
+
+      <!-- 목차 트리 컨테이너 -->
+      <div id="treeContainer" class="flex-1 overflow-y-auto p-2.5 space-y-1 custom-scrollbar"></div>
+
+      <!-- 하단 범례 바 -->
+      <div class="p-2.5 bg-[#f4f1ea] border-t border-[#e2dcd0] text-[11px] text-stone-600 flex flex-wrap items-center justify-between gap-1 flex-shrink-0 font-medium">
+        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-purple-600 inline-block"></span>편</span>
+        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-600 inline-block"></span>장</span>
+        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-teal-600 inline-block"></span>절</span>
+        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-600 inline-block"></span>관</span>
+        <span class="inline-flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-indigo-600 inline-block"></span>서문</span>
+      </div>
+    </aside>
+
+    <!-- 우측 슬라이드 뷰어 영역 (따뜻한 독서 데스크 배경) -->
+    <main class="flex-1 flex flex-col bg-[#efece6] overflow-hidden relative min-w-0">
+      
+      <div class="bg-[#faf8f5] border-b border-[#e2dcd0] px-3 md:px-6 py-1.5 flex items-center justify-between flex-shrink-0">
+        <div id="breadcrumbContainer" class="flex items-center gap-1 text-[11px] sm:text-xs text-stone-500 font-medium overflow-x-auto whitespace-nowrap pr-2">
+          <span>도서 분야를 선택해주세요.</span>
+        </div>
+        
+        <div class="flex items-center gap-1 flex-shrink-0">
+          <span id="nodeTypeBadge" class="text-[9px] sm:text-[10px] px-1.5 py-0.2 font-bold rounded-full border">
+            구조
+          </span>
+        </div>
+      </div>
+
+      <div id="slideTouchArea" class="flex-1 flex flex-col p-2.5 sm:p-4 md:p-6 overflow-hidden">
+        
+        <div class="flex items-center justify-between mb-2 sm:mb-3 flex-shrink-0">
+          <div class="flex items-center gap-1.5 min-w-0 mr-1.5">
+            <span id="headerTypeIcon" class="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 bg-stone-200/70 text-stone-600">
+              <i class="fa-solid fa-bookmark"></i>
+            </span>
+            <h2 id="currentHeadingTitle" class="text-sm sm:text-base md:text-lg font-bold truncate text-stone-800">
+              항목 제목
+            </h2>
+          </div>
+
+          <div class="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+            <div id="editActionGroup" class="hidden items-center gap-1">
+              <button onclick="enableInlineEdit()" id="btnStartEdit" class="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded text-[11px] font-bold transition flex items-center gap-1">
+                <i class="fa-solid fa-pen text-[10px]"></i>
+                <span class="hidden sm:inline">수정</span>
+              </button>
+              <button onclick="saveInlineEdit()" id="btnSaveEdit" class="hidden px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-bold transition items-center gap-1">
+                <i class="fa-solid fa-floppy-disk text-[10px]"></i>
+                <span>저장</span>
+              </button>
+              <button onclick="cancelInlineEdit()" id="btnCancelEdit" class="hidden px-1.5 py-0.5 bg-stone-200 hover:bg-stone-300 text-stone-700 rounded text-[11px] font-bold transition items-center">
+                <i class="fa-solid fa-xmark text-[10px]"></i>
+              </button>
+            </div>
+
+            <div class="flex items-center bg-[#faf8f5] border border-[#dcd5c7] rounded-lg p-0.5 shadow-2xs">
+              <button onclick="toggleTTS()" id="btnTTSPlay" class="px-2 py-0.5 text-[11px] font-semibold text-stone-600 hover:text-emerald-700 rounded flex items-center gap-1 transition" title="음성 낭독">
+                <i id="ttsPlayIcon" class="fa-solid fa-volume-high text-emerald-600 text-xs"></i>
+                <span id="ttsStatusText" class="hidden sm:inline text-[10px]">읽기</span>
+              </button>
+              <button onclick="stopTTS()" id="btnTTSStop" class="p-1 text-stone-400 hover:text-rose-600 rounded transition" title="정지">
+                <i class="fa-solid fa-stop text-xs"></i>
+              </button>
+            </div>
+
+            <div class="bg-[#faf8f5] border border-[#dcd5c7] px-2.5 py-0.5 rounded-lg text-[11px] font-semibold text-stone-700 shadow-2xs flex items-center gap-1">
+              <i class="fa-regular fa-clone text-emerald-700 text-[10px]"></i>
+              <span><span id="currentSlideNum" class="text-emerald-700 font-bold">0</span>/<span id="totalSlideNum">0</span></span>
+            </div>
+
+            <button onclick="deleteCurrentSlide()" id="btnDeleteSlide" class="hidden px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 rounded text-[11px] font-bold transition items-center gap-1" title="삭제">
+              <i class="fa-solid fa-trash-can text-[10px]"></i>
+              <span class="hidden sm:inline">삭제</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 슬라이드 본문 카드 (웜 페이퍼 북 페이지 디자인 적용) -->
+        <div class="flex-1 flex items-center gap-2 sm:gap-3.5 md:gap-4 min-h-0 relative">
+          <button id="prevBtn" onclick="navigateSlide(-1)" class="hidden lg:flex w-10 h-16 bg-[#faf8f5] hover:bg-stone-800 text-stone-500 hover:text-white rounded-xl shadow-xs border border-[#dcd5c7] items-center justify-center transition disabled:opacity-30 disabled:pointer-events-none group flex-shrink-0" disabled>
+            <i class="fa-solid fa-chevron-left text-lg group-hover:-translate-x-0.5 transition-transform"></i>
+          </button>
+
+          <div class="book-slide-card flex-1 h-full rounded-xl md:rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col justify-between overflow-hidden relative">
+            <div id="slideHeaderContainer" class="flex-shrink-0 border-b border-[#e5dec9] pb-2 mb-2.5 hidden">
+              <div class="flex items-center gap-1.5 mb-1">
+                <span id="slideTagBadge" class="text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded border">
+                  #1
+                </span>
+                <p id="slideSubtitle" class="text-[10px] sm:text-[11px] font-semibold truncate text-stone-400"></p>
+              </div>
+              <h3 id="slideTitle" class="tts-line-block px-1 text-xs sm:text-sm md:text-[15.5px] font-bold leading-[1.8] line-clamp-2 md:line-clamp-none"></h3>
+            </div>
+
+            <div id="slideContent" class="flex-1 overflow-y-auto custom-scrollbar text-xs sm:text-sm md:text-[15.5px] leading-[1.8] pr-1.5 pb-4 font-normal">
+              <div class="h-full flex flex-col items-center justify-center text-stone-400 text-xs sm:text-sm p-8 text-center">
+                <i class="fa-solid fa-book-open text-3xl text-amber-700/40 mb-3"></i>
+                <p class="font-bold text-stone-600 mb-1">도서 분류 체계를 선택해주세요</p>
+                <p class="text-xs text-stone-400">상단 드롭다운에서 분야를 선택하거나 '도서 검색' 버튼으로 원하는 책을 찾아보세요.</p>
+              </div>
+            </div>
+
+            <div id="slideEditContainer" class="flex-1 hidden flex-col pb-2 min-h-0">
+              <div class="flex items-center justify-between text-[10px] text-emerald-800 bg-emerald-50/90 px-2.5 py-1 rounded mb-1.5 border border-emerald-200 font-medium">
+                <span><i class="fa-solid fa-pencil mr-1"></i>슬라이드 내용 수정 중 (시트에 즉시 반영됩니다)</span>
+              </div>
+              <textarea id="slideEditTextArea" class="flex-1 w-full p-3 bg-white border border-emerald-300 focus:border-emerald-500 rounded-lg text-xs sm:text-sm text-stone-800 leading-relaxed font-mono resize-none focus:outline-none focus:ring-2 focus:ring-emerald-200 custom-scrollbar shadow-inner" placeholder="내용을 입력하세요."></textarea>
+            </div>
+
+            <div class="flex-shrink-0 pt-2.5 mt-1 border-t border-[#e5dec9] flex items-center justify-between">
+              <button id="mobilePrevBtn" onclick="navigateSlide(-1)" class="lg:hidden px-3 py-1 bg-[#f0ebe1] hover:bg-[#e5dec9] text-stone-700 rounded-lg text-[11px] font-bold disabled:opacity-30 transition flex items-center gap-1" disabled>
+                <i class="fa-solid fa-chevron-left text-[9px]"></i> 이전
+              </button>
+
+              <div id="dotsContainer" class="flex items-center gap-1.5 overflow-x-auto max-w-[50%] md:max-w-[60%] py-0.5"></div>
+
+              <button id="mobileNextBtn" onclick="navigateSlide(1)" class="lg:hidden px-3 py-1 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg text-[11px] font-bold disabled:opacity-30 transition flex items-center gap-1" disabled>
+                다음 <i class="fa-solid fa-chevron-right text-[9px]"></i>
+              </button>
+
+              <span id="pageTag" class="hidden lg:inline text-[11px] text-stone-400 font-medium tracking-wide">Page 0</span>
+            </div>
+          </div>
+
+          <button id="nextBtn" onclick="navigateSlide(1)" class="hidden lg:flex w-10 h-16 bg-[#faf8f5] hover:bg-stone-800 text-stone-500 hover:text-white rounded-xl shadow-xs border border-[#dcd5c7] items-center justify-center transition disabled:opacity-30 disabled:pointer-events-none group flex-shrink-0" disabled>
+            <i class="fa-solid fa-chevron-right text-lg group-hover:translate-x-0.5 transition-transform"></i>
+          </button>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- 도서 검색 및 바로가기 모달 -->
+  <div id="bookSearchModal" class="fixed inset-0 bg-stone-900/50 backdrop-blur-xs z-50 flex items-start sm:items-center justify-center hidden p-3 pt-12 sm:pt-3">
+    <div class="bg-white rounded-2xl w-full max-w-lg shadow-2xl border border-stone-100 flex flex-col max-h-[85vh] overflow-hidden">
+      <div class="p-3.5 sm:p-4 border-b border-stone-100 bg-stone-50 flex-shrink-0">
+        <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-stone-800">
+            <i class="fa-solid fa-book-open text-emerald-600"></i>
+            <span>도서 통합 검색</span>
+          </div>
+          <button onclick="closeModal('bookSearchModal')" class="text-stone-400 hover:text-stone-600 p-1">
+            <i class="fa-solid fa-xmark text-sm"></i>
+          </button>
+        </div>
+
+        <div class="relative">
+          <input type="text" id="globalBookSearchInput" oninput="handleBookSearchQuery(this.value)" placeholder="검색할 도서명 또는 키워드를 입력하세요..." class="w-full bg-white border border-emerald-300 rounded-lg pl-8 pr-3 py-2 text-xs sm:text-sm font-semibold focus:ring-2 focus:ring-emerald-400 focus:outline-none">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 sm:top-3 text-xs text-emerald-600"></i>
+        </div>
+
+        <div class="flex items-center justify-between text-[11px] text-stone-500 mt-2 px-0.5">
+          <span id="searchResultCountText">검색어를 입력해주세요</span>
+          <span class="text-[10px] text-stone-400">클릭 시 해당 도서로 즉시 이동</span>
+        </div>
+      </div>
+
+      <div id="bookSearchResultList" class="flex-1 overflow-y-auto p-2 sm:p-3 space-y-1.5 custom-scrollbar"></div>
+
+      <div class="p-2 border-t border-stone-100 bg-stone-50 flex justify-end">
+        <button onclick="closeModal('bookSearchModal')" class="px-3 py-1 text-xs text-stone-600 hover:bg-stone-200 rounded font-semibold transition">닫기</button>
       </div>
     </div>
+  </div>
 
-    <!-- 2. 주일 찬양 섹션 및 찬양곡 목록 -->
-    <div class="space-y-2.5">
-      <div class="p-3.5 bg-gradient-to-r from-indigo-50/90 via-slate-50/80 to-violet-50/90 border border-indigo-200/80 rounded-2xl shadow-sm">
-        <div class="flex items-center justify-between mb-2.5">
-          <div class="flex items-center gap-2">
-            <div class="w-7 h-7 rounded-lg bg-indigo-600 flex items-center justify-center text-white shadow-sm shadow-indigo-200">
-              <i data-lucide="calendar-heart" class="w-3.5 h-3.5"></i>
+  <!-- 모달 1: 슬라이드 신규 등록 모달 -->
+  <div id="addDataModal" class="fixed inset-0 bg-stone-900/50 backdrop-blur-xs z-50 flex items-center justify-center hidden p-3">
+    <div class="bg-white rounded-2xl p-4 md:p-6 w-full max-w-lg shadow-2xl border border-stone-100 max-h-[92vh] overflow-y-auto custom-scrollbar">
+      <div class="flex items-center justify-between mb-2.5 pb-2 border-b border-stone-100">
+        <h3 id="modalFormTitle" class="text-sm md:text-base font-bold text-stone-900 flex items-center gap-1.5">
+          <i class="fa-solid fa-cloud-arrow-up text-emerald-600"></i> 새 슬라이드 등록
+        </h3>
+        <button onclick="closeModal('addDataModal')" class="text-stone-400 hover:text-stone-600 p-1"><i class="fa-solid fa-xmark text-base"></i></button>
+      </div>
+
+      <div class="space-y-2.5 text-xs">
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="font-bold text-stone-600 block mb-1">도서명 (워크시트명)</label>
+            <input type="text" id="inBookTitle" class="w-full p-1.5 border border-stone-300 rounded-lg text-xs font-semibold" placeholder="예: 팀 켈러, 고통에 답하다">
+          </div>
+          <div>
+            <label class="font-bold text-stone-600 block mb-1">저자</label>
+            <input type="text" id="inAuthor" class="w-full p-1.5 border border-stone-300 rounded-lg text-xs" placeholder="예: 팀 켈러">
+          </div>
+        </div>
+
+        <div>
+          <label class="font-bold text-stone-600 block mb-1">항목 분류</label>
+          <select id="inCategorySelect" onchange="onCategoryChange(this.value)" class="w-full p-1.5 border border-stone-300 rounded-lg text-xs bg-stone-50 font-semibold">
+            <option value="content">📖 본문 (편 / 장 / 절 / 관 구성)</option>
+            <option value="prologue">✨ 프롤로그 / 머리말</option>
+            <option value="author">👤 지은이 소개</option>
+            <option value="epilogue">🍂 에필로그 / 맺음말</option>
+            <option value="appendix">📎 부록 / 참고자료</option>
+          </select>
+        </div>
+
+        <div id="contentHierarchyFields" class="space-y-2 bg-stone-50 p-2 rounded-xl border border-stone-200">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="font-bold text-stone-600 block mb-0.5">편 (Part) <span class="text-purple-600">*필수</span></label>
+              <input type="text" id="inPart" class="w-full p-1 border border-stone-300 rounded text-xs" placeholder="예: 1부 고통과 마주하다">
             </div>
             <div>
-              <span class="text-[10px] font-bold text-indigo-700 uppercase block -mb-1">Sunday Worship</span>
-              <span class="text-xs sm:text-sm font-bold text-slate-900">주일 찬양</span>
+              <label class="font-bold text-stone-600 block mb-0.5">장 (Chapter)</label>
+              <input type="text" id="inChapter" class="w-full p-1 border border-stone-300 rounded text-xs" placeholder="공란 가능">
             </div>
           </div>
-          <span class="text-[11px] font-medium text-indigo-700/80">연습할 파트 선택</span>
-        </div>
-
-        <!-- Part Selector Pills -->
-        <div class="grid grid-cols-5 gap-1.5">
-          <button onclick="changePart('all')" data-part="all" class="part-btn py-2 text-center rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 active:scale-95">
-            합창
-          </button>
-          <button onclick="changePart('soprano')" data-part="soprano" class="part-btn py-2 text-center rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 active:scale-95">
-            소프
-          </button>
-          <button onclick="changePart('alto')" data-part="alto" class="part-btn py-2 text-center rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 active:scale-95">
-            알토
-          </button>
-          <button onclick="changePart('tenor')" data-part="tenor" class="part-btn py-2 text-center rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 active:scale-95">
-            테너
-          </button>
-          <button onclick="changePart('bass')" data-part="bass" class="part-btn py-2 text-center rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 active:scale-95">
-            베이스
-          </button>
-        </div>
-      </div>
-
-      <!-- 찬양곡 리스트 Container (스크롤 적용 영역) -->
-      <div class="glass-card rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-        <div id="songList" class="divide-y divide-slate-100/80 max-h-[380px] sm:max-h-[440px] overflow-y-auto custom-scrollbar">
-          <!-- JS로 동적 렌더링 -->
-        </div>
-      </div>
-    </div>
-
-    <!-- 3. 기도송 섹션 -->
-    <div class="p-3.5 bg-gradient-to-r from-teal-50/90 via-emerald-50/70 to-teal-50/90 border border-teal-200/80 rounded-2xl shadow-sm">
-      <div class="flex items-center justify-between mb-2.5">
-        <div class="flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-teal-600 flex items-center justify-center text-white shadow-sm shadow-teal-200">
-            <i data-lucide="heart-handshake" class="w-3.5 h-3.5"></i>
-          </div>
-          <div>
-            <span class="text-[10px] font-bold text-teal-700 uppercase block -mb-1">Prayer Song</span>
-            <span class="text-xs sm:text-sm font-bold text-slate-900">기도송</span>
-          </div>
-        </div>
-        <span class="text-[11px] font-medium text-teal-700/80">파트별 바로듣기</span>
-      </div>
-
-      <div class="grid grid-cols-5 gap-1.5">
-        <a 
-          href="https://youtu.be/QUB6kOp9lrs?si=XRuVWhGYo1JuRAwz" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="py-1.5 px-1 text-center bg-white hover:bg-indigo-600 text-indigo-700 hover:text-white font-bold text-xs rounded-xl border border-indigo-200/80 shadow-xs transition-all active:scale-95 flex items-center justify-center gap-0.5"
-        >
-          <span>합창</span>
-          <i data-lucide="arrow-up-right" class="w-3 h-3 opacity-60"></i>
-        </a>
-        <a 
-          href="https://youtu.be/BGU9SOKh180?si=VbEdQ8fPcX5DTyTe" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="py-1.5 px-1 text-center bg-white hover:bg-rose-500 text-rose-600 hover:text-white font-bold text-xs rounded-xl border border-rose-200/80 shadow-xs transition-all active:scale-95 flex items-center justify-center gap-0.5"
-        >
-          <span>소프</span>
-          <i data-lucide="arrow-up-right" class="w-3 h-3 opacity-60"></i>
-        </a>
-        <a 
-          href="https://youtu.be/UPJnCBOpPEA?si=FRWuVFWf1pX6y_To" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="py-1.5 px-1 text-center bg-white hover:bg-amber-500 text-amber-700 hover:text-white font-bold text-xs rounded-xl border border-amber-200/80 shadow-xs transition-all active:scale-95 flex items-center justify-center gap-0.5"
-        >
-          <span>알토</span>
-          <i data-lucide="arrow-up-right" class="w-3 h-3 opacity-60"></i>
-        </a>
-        <a 
-          href="https://youtu.be/0-io9jPwehc?si=gompF-bfpjpUGWHy" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="py-1.5 px-1 text-center bg-white hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold text-xs rounded-xl border border-emerald-200/80 shadow-xs transition-all active:scale-95 flex items-center justify-center gap-0.5"
-        >
-          <span>테너</span>
-          <i data-lucide="arrow-up-right" class="w-3 h-3 opacity-60"></i>
-        </a>
-        <a 
-          href="https://youtu.be/uNgSgpgNHa4?si=RzwtoFWg48ySLJb0" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="py-1.5 px-1 text-center bg-white hover:bg-sky-600 text-sky-700 hover:text-white font-bold text-xs rounded-xl border border-sky-200/80 shadow-xs transition-all active:scale-95 flex items-center justify-center gap-0.5"
-        >
-          <span>베이스</span>
-          <i data-lucide="arrow-up-right" class="w-3 h-3 opacity-60"></i>
-        </a>
-      </div>
-    </div>
-
-    <!-- 4. 축도송 섹션 -->
-    <div class="p-3.5 bg-gradient-to-r from-amber-50/90 via-orange-50/70 to-amber-50/90 border border-amber-200/80 rounded-2xl shadow-sm">
-      <div class="flex items-center justify-between mb-2.5">
-        <div class="flex items-center gap-2">
-          <div class="w-7 h-7 rounded-lg bg-amber-500 flex items-center justify-center text-white shadow-sm shadow-amber-200">
-            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-          </div>
-          <div>
-            <span class="text-[10px] font-bold text-amber-700 uppercase block -mb-1">Special Anthem</span>
-            <span class="text-xs sm:text-sm font-bold text-slate-900">축도송</span>
-          </div>
-        </div>
-        <span class="text-[11px] font-medium text-amber-700/80">파트별 바로듣기</span>
-      </div>
-
-      <div class="grid grid-cols-5 gap-1.5">
-        <a 
-          href="https://youtu.be/YRvXLN4j4nk?si=BUQHkFeFostNSByB" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="py-1.5 px-1 text-center bg-white hover:bg-indigo-600 text-indigo-700 hover:text-white font-bold text-xs rounded-xl border border-indigo-200/80 shadow-xs transition-all active:scale-95 flex items-center justify-center gap-0.5"
-        >
-          <span>합창</span>
-          <i data-lucide="arrow-up-right" class="w-3 h-3 opacity-60"></i>
-        </a>
-        <a 
-          href="https://youtu.be/CUUvQKpHKt0?si=kq7he8ZBHCh-89nk" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="py-1.5 px-1 text-center bg-white hover:bg-rose-500 text-rose-600 hover:text-white font-bold text-xs rounded-xl border border-rose-200/80 shadow-xs transition-all active:scale-95 flex items-center justify-center gap-0.5"
-        >
-          <span>소프</span>
-          <i data-lucide="arrow-up-right" class="w-3 h-3 opacity-60"></i>
-        </a>
-        <a 
-          href="https://youtu.be/kAJcggWKfRk?si=TKFlRyq3lEtt7szG" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="py-1.5 px-1 text-center bg-white hover:bg-amber-500 text-amber-700 hover:text-white font-bold text-xs rounded-xl border border-amber-200/80 shadow-xs transition-all active:scale-95 flex items-center justify-center gap-0.5"
-        >
-          <span>알토</span>
-          <i data-lucide="arrow-up-right" class="w-3 h-3 opacity-60"></i>
-        </a>
-        <a 
-          href="https://youtu.be/eMN3JUcKxeg?si=mrlq1Jfacooo02d7" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="py-1.5 px-1 text-center bg-white hover:bg-emerald-600 text-emerald-700 hover:text-white font-bold text-xs rounded-xl border border-emerald-200/80 shadow-xs transition-all active:scale-95 flex items-center justify-center gap-0.5"
-        >
-          <span>테너</span>
-          <i data-lucide="arrow-up-right" class="w-3 h-3 opacity-60"></i>
-        </a>
-        <a 
-          href="https://youtu.be/SaSgGkTsUgs?si=Tcmx_BlsXTSc8CFi" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          class="py-1.5 px-1 text-center bg-white hover:bg-sky-600 text-sky-700 hover:text-white font-bold text-xs rounded-xl border border-sky-200/80 shadow-xs transition-all active:scale-95 flex items-center justify-center gap-0.5"
-        >
-          <span>베이스</span>
-          <i data-lucide="arrow-up-right" class="w-3 h-3 opacity-60"></i>
-        </a>
-      </div>
-    </div>
-
-    <!-- 5. 성가대 찬양 영상 모음 바로가기 배너 -->
-    <a 
-      href="https://youtube.com/channel/UCdmrfUBTAZ-ycCYuzobCEfw?si=uT4vJNGNDfeItIzT" 
-      target="_blank" 
-      rel="noopener noreferrer"
-      class="flex items-center justify-between p-3.5 bg-gradient-to-r from-rose-50 to-red-50 hover:from-rose-100 hover:to-red-100 border border-rose-200/70 rounded-2xl group transition-all duration-200 shadow-sm"
-    >
-      <div class="flex items-center gap-2.5">
-        <div class="w-8 h-8 rounded-xl bg-rose-500 flex items-center justify-center text-white shadow-sm shadow-rose-200">
-          <i data-lucide="youtube" class="w-4 h-4"></i>
-        </div>
-        <div>
-          <span class="text-[10px] font-bold text-rose-600 uppercase block -mb-0.5">YouTube Channel</span>
-          <span class="text-xs sm:text-sm font-bold text-slate-800 group-hover:text-rose-700 transition">성가대 유튜브 채널 바로가기</span>
-        </div>
-      </div>
-      <i data-lucide="arrow-up-right" class="w-4 h-4 text-rose-400 group-hover:text-rose-600 transition"></i>
-    </a>
-
-  </main>
-
-  <!-- Add Song Modal -->
-  <div id="songModal" class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/40 backdrop-blur-sm hidden opacity-0 transition-opacity duration-200">
-    <div class="bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden transform translate-y-8 sm:translate-y-0 sm:scale-95 transition-all duration-200 max-h-[90vh] flex flex-col" id="songModalContent">
-      
-      <div class="px-6 py-4.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-        <div>
-          <h3 class="text-base font-bold text-slate-900">새 찬양곡 등록</h3>
-          <p class="text-xs text-slate-500 mt-0.5">각 파트별 유튜브 링크를 입력해 주세요.</p>
-        </div>
-        <button onclick="closeSongModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-      </div>
-
-      <form id="songForm" onsubmit="saveSong(event)" class="p-6 space-y-4 overflow-y-auto custom-scrollbar">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">찬양 일자</label>
-            <input type="date" id="songDate" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">곡 제목</label>
-            <input type="text" id="songTitle" required placeholder="예: 은혜 아니면" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition">
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="font-bold text-stone-600 block mb-0.5">절 (Section)</label>
+              <input type="text" id="inSection" class="w-full p-1 border border-stone-300 rounded text-xs" placeholder="공란 가능">
+            </div>
+            <div>
+              <label class="font-bold text-stone-600 block mb-0.5">관 (Subsection)</label>
+              <input type="text" id="inSubsection" class="w-full p-1 border border-stone-300 rounded text-xs" placeholder="공란 가능">
+            </div>
           </div>
         </div>
 
-        <div class="pt-2 border-t border-slate-100 space-y-3">
-          <label class="block text-xs font-bold text-slate-700 tracking-wide">파트별 유튜브 링크</label>
+        <div class="grid grid-cols-4 gap-2">
+          <div class="col-span-1">
+            <label class="font-bold text-stone-600 block mb-0.5">시작 순번</label>
+            <input type="number" id="inSlideOrder" value="1" min="1" class="w-full p-1.5 border border-stone-300 rounded text-xs font-semibold" title="첫 번째 생성될 슬라이드의 순번입니다">
+          </div>
+          <div class="col-span-3">
+            <label class="font-bold text-stone-600 block mb-0.5">슬라이드 제목 (선택)</label>
+            <input type="text" id="inSlideTitle" class="w-full p-1.5 border border-stone-300 rounded text-xs" placeholder="직접 입력 시에만 저장됩니다 (공란 가능)">
+          </div>
+        </div>
+
+        <!-- 노션 복사 원문 입력 영역 -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label class="font-bold text-stone-700 block text-xs">노션 복사 본문 붙여넣기</label>
+            <span class="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-semibold border border-emerald-200">
+              글머리기호 시작 ~ 새 본문 시작까지 = 1개 슬라이드
+            </span>
+          </div>
+          <textarea id="inSlideBody" rows="5" oninput="handleNotionBodyInput(this.value)" 
+            class="w-full p-2 border border-stone-300 rounded-lg text-xs font-mono leading-relaxed focus:ring-1 focus:ring-emerald-500 focus:outline-none" 
+            placeholder="노션에서 본문 전체를 복사하여 여기에 붙여넣으세요.&#10;&#10;첫 글머리기호(•, -, * 등)부터 새로운 대문단/새 본문 시작 직전까지가 슬라이드 순번 1이 되고, 다음 글머리기호 대문단을 만나면 순번 2, 3...으로 자동 분할됩니다."></textarea>
+        </div>
+
+        <!-- 자동 분할된 슬라이드 미리보기 -->
+        <div class="bg-stone-50 border border-stone-200 rounded-xl p-2.5 space-y-2">
+          <div class="flex items-center justify-between text-[11px]">
+            <span class="font-bold text-stone-700 flex items-center gap-1">
+              <i class="fa-solid fa-layer-group text-emerald-600"></i> 자동 분할될 슬라이드 목록 (<span id="parsedSlideCountBadge" class="text-emerald-600 font-bold">0개</span>)
+            </span>
+            <span class="text-stone-400 text-[10px]">시트에 각 행으로 연속 저장됩니다</span>
+          </div>
           
-          <div class="space-y-2.5">
-            <div class="flex items-center gap-2">
-              <span class="w-16 text-xs font-bold text-indigo-600 shrink-0">전체 합창</span>
-              <input type="url" id="linkAll" placeholder="https://youtu.be/..." class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:border-indigo-500">
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="w-16 text-xs font-bold text-rose-500 shrink-0">소프라노</span>
-              <input type="url" id="linkSoprano" placeholder="https://youtu.be/..." class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:border-rose-500">
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="w-16 text-xs font-bold text-amber-600 shrink-0">알토</span>
-              <input type="url" id="linkAlto" placeholder="https://youtu.be/..." class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:border-amber-500">
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="w-16 text-xs font-bold text-emerald-600 shrink-0">테너</span>
-              <input type="url" id="linkTenor" placeholder="https://youtu.be/..." class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:border-emerald-500">
-            </div>
-            <div class="flex items-center gap-2">
-              <span class="w-16 text-xs font-bold text-sky-600 shrink-0">베이스</span>
-              <input type="url" id="linkBass" placeholder="https://youtu.be/..." class="flex-1 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:border-sky-500">
+          <div id="parsedSlidesContainer" class="max-h-48 overflow-y-auto space-y-1.5 custom-scrollbar pr-1">
+            <div class="p-4 text-center text-stone-400 text-[11px] bg-white rounded-lg border border-stone-200">
+              본문을 입력하시면 글머리기호 구간별로 분할된 슬라이드 순번이 표시됩니다.
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="pt-4 border-t border-slate-100 flex items-center justify-end gap-2.5">
-          <button type="button" onclick="closeSongModal()" class="px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition">취소</button>
-          <button type="submit" id="submitBtn" class="px-5 py-2.5 text-xs sm:text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-sm hover:shadow active:scale-95 transition-all flex items-center gap-1.5">
-            <span>저장하기</span>
-          </button>
+      <div class="mt-3 flex items-center justify-between pt-2 border-t border-stone-100">
+        <span id="saveProgressStatus" class="text-[11px] font-semibold text-stone-500"></span>
+        <div class="flex gap-2">
+          <button onclick="closeModal('addDataModal')" class="px-3 py-1 text-xs text-stone-600 hover:bg-stone-100 rounded font-semibold">취소</button>
+          <button onclick="submitRowToSheet()" id="btnSubmitRow" class="px-3.5 py-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold shadow-xs">시트에 저장</button>
         </div>
-      </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달 2: 시스템 설정 모달 -->
+  <div id="apiSettingModal" class="fixed inset-0 bg-stone-900/50 backdrop-blur-xs z-50 flex items-center justify-center hidden p-3">
+    <div class="bg-white rounded-2xl p-4 sm:p-5 w-full max-w-sm shadow-2xl border border-stone-100 space-y-3">
+      <div class="flex items-center justify-between border-b border-stone-100 pb-2">
+        <h3 class="text-sm font-bold text-stone-900 flex items-center gap-1.5">
+          <i class="fa-solid fa-sliders text-emerald-600"></i> 시스템 설정
+        </h3>
+        <button onclick="closeModal('apiSettingModal')" class="text-stone-400 hover:text-stone-600 p-1"><i class="fa-solid fa-xmark text-base"></i></button>
+      </div>
+
+      <div class="text-xs space-y-2.5">
+        <p class="text-stone-500 text-[11px] leading-relaxed">
+          11개 도서 분류별 전용 Apps Script가 직접 연동되어 있습니다.<br>
+          현재 분야: <strong id="modalCurrentGenreText" class="text-indigo-600 font-bold"></strong>
+        </p>
+        <div>
+          <label class="block font-bold text-stone-700 mb-1">관리자 비밀번호 변경</label>
+          <input type="password" id="adminPasswordInput" class="w-full p-2 border border-stone-300 rounded-lg text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none" placeholder="새 비밀번호 (기본: 1234)">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-stone-100">
+        <button onclick="closeModal('apiSettingModal')" class="px-3 py-1 text-xs text-stone-600 hover:bg-stone-100 rounded font-semibold">닫기</button>
+        <button onclick="saveAdminPwSetting()" class="px-3.5 py-1 text-xs bg-emerald-600 hover:bg-emerald-700 text-white rounded font-bold">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 모달 3: 회원 로그인 모달 -->
+  <div id="userLoginModal" class="fixed inset-0 bg-stone-900/50 backdrop-blur-xs z-50 flex items-center justify-center hidden p-3">
+    <div class="bg-white rounded-2xl p-4 sm:p-5 w-full max-w-xs shadow-2xl border border-stone-100 space-y-3">
+      <div class="flex items-center justify-between border-b border-stone-100 pb-2">
+        <h3 class="text-sm font-bold text-stone-900 flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-user text-indigo-600"></i> 회원 로그인
+        </h3>
+        <button onclick="closeModal('userLoginModal')" class="text-stone-400 hover:text-stone-600 p-1"><i class="fa-solid fa-xmark text-base"></i></button>
+      </div>
+
+      <p class="text-[11px] text-stone-500">1 ~ 100,000 사이의 회원 번호를 ID와 비밀번호에 동일하게 입력해주세요.</p>
+
+      <div class="space-y-2.5 text-xs">
+        <div>
+          <label class="block font-bold text-stone-700 mb-1">회원 ID (일련번호)</label>
+          <input type="number" id="loginUserId" min="1" max="100000" class="w-full p-2 border border-stone-300 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none" placeholder="예: 1">
+        </div>
+        <div>
+          <label class="block font-bold text-stone-700 mb-1">비밀번호 (ID와 동일)</label>
+          <input type="password" id="loginUserPw" class="w-full p-2 border border-stone-300 rounded-lg text-xs focus:ring-1 focus:ring-indigo-500 focus:outline-none" placeholder="예: 1">
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-2 border-t border-stone-100">
+        <button onclick="closeModal('userLoginModal')" class="px-3 py-1 text-xs text-stone-600 hover:bg-stone-100 rounded font-semibold">취소</button>
+        <button onclick="submitUserLogin()" class="px-3.5 py-1 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded font-bold">로그인</button>
+      </div>
     </div>
   </div>
 
   <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwHW4_h-wk9AxHYhL7IbSRCgLbq7f3qMLkCvyy3bg5ZfHhwKnlsqdiG8GIBNs9x1PAohA/exec";
-    const CACHE_KEY = "GLORIA_CHOIR_SONGS_CACHE";
-
-    let songs = [];
-    let isDataLoaded = false;
-    let currentPart = 'all';
-
-    const PART_THEMES = {
-      all: {
-        active: "bg-indigo-600 text-white border-indigo-600 shadow-md shadow-indigo-300 ring-2 ring-indigo-300",
-        inactive: "bg-white text-indigo-700 border-indigo-200/90 hover:bg-indigo-50/80 shadow-xs",
-        badge: "text-indigo-700 bg-indigo-50 border-indigo-100/80 group-hover:bg-indigo-100/90",
-        hover: "hover:bg-indigo-50/50 group-hover:text-indigo-900",
-        icon: "group-hover:text-indigo-600 group-hover:bg-indigo-100/60"
-      },
-      soprano: {
-        active: "bg-rose-500 text-white border-rose-500 shadow-md shadow-rose-300 ring-2 ring-rose-300",
-        inactive: "bg-white text-rose-600 border-rose-200/90 hover:bg-rose-50/80 shadow-xs",
-        badge: "text-rose-700 bg-rose-50 border-rose-100/80 group-hover:bg-rose-100/90",
-        hover: "hover:bg-rose-50/50 group-hover:text-rose-900",
-        icon: "group-hover:text-rose-600 group-hover:bg-rose-100/60"
-      },
-      alto: {
-        active: "bg-amber-500 text-white border-amber-500 shadow-md shadow-amber-300 ring-2 ring-amber-300",
-        inactive: "bg-white text-amber-700 border-amber-200/90 hover:bg-amber-50/80 shadow-xs",
-        badge: "text-amber-700 bg-amber-50 border-amber-100/80 group-hover:bg-amber-100/90",
-        hover: "hover:bg-amber-50/50 group-hover:text-amber-900",
-        icon: "group-hover:text-amber-600 group-hover:bg-amber-100/60"
-      },
-      tenor: {
-        active: "bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-300 ring-2 ring-emerald-300",
-        inactive: "bg-white text-emerald-700 border-emerald-200/90 hover:bg-emerald-50/80 shadow-xs",
-        badge: "text-emerald-700 bg-emerald-50 border-emerald-100/80 group-hover:bg-emerald-100/90",
-        hover: "hover:bg-emerald-50/50 group-hover:text-emerald-900",
-        icon: "group-hover:text-emerald-600 group-hover:bg-emerald-100/60"
-      },
-      bass: {
-        active: "bg-sky-600 text-white border-sky-600 shadow-md shadow-sky-300 ring-2 ring-sky-300",
-        inactive: "bg-white text-sky-700 border-sky-200/90 hover:bg-sky-50/80 shadow-xs",
-        badge: "text-sky-700 bg-sky-50 border-sky-100/80 group-hover:bg-sky-100/90",
-        hover: "hover:bg-sky-50/50 group-hover:text-sky-900",
-        icon: "group-hover:text-sky-600 group-hover:bg-sky-100/60"
-      }
+    const GENRE_API_URLS = {
+      "종교": "https://script.google.com/macros/s/AKfycby6DvIBMHbr_XARJa-vMX9vRdiyAs1WmVmQRQUFlT60544_dL4ZeuHcViP9JJDrLOR5/exec",
+      "기술과학": "https://script.google.com/macros/s/AKfycbxwFuAKviYQoUNm_HgFoZbkiuB1d2MZTtRq3FBj7FJFEyB426dA-dR9J2yIWT6XHsI/exec",
+      "사회과학": "https://script.google.com/macros/s/AKfycbxelwGE9U7rvj4GzPN1E2BaC2mu9HKYvUZ2HxUD8DTxOyh0HtiQI7kv3hA_q52nburzGA/exec",
+      "언어": "https://script.google.com/macros/s/AKfycbziAs5sq1FeF1e_pIYnBGrSYELzm0XtCtVM21vhzAvnizWY9hRDNf_9dQF6QAO1cauM/exec",
+      "역사": "https://script.google.com/macros/s/AKfycbyX7_mpsohU2a3b0vBCSuw1FGeYf_m4lO8n19MUF3G4hsrZqgseA55ACFSY5IElzKAS/exec",
+      "예술": "https://script.google.com/macros/s/AKfycbxR2UY4srzXod7ZVgmaeApKx9zKs4RsrABU8szrkQw8u3kblgzhXBJvrGjUYApgXgqh/exec",
+      "외국문학": "https://script.google.com/macros/s/AKfycbxgMI4JHJohqw31ChkgptG089UxMYKBxu2IxPpdc7paI1U6SrTavtZgAoTdHDdPWNfAUg/exec",
+      "자연과학": "https://script.google.com/macros/s/AKfycbz6BFENjVDHUwH0dXwcHZCJg0xnyw4s4z-QoqO3h3yayyLphZ1FbC6ErOv8wSv0L74B/exec",
+      "철학": "https://script.google.com/macros/s/AKfycbx0M6v5JfRdEH82N3w24-XlCfWjg8jtiIdBUomf0OjBLQggSJ8bMnMvoSvkvr-Ji4PYcw/exec",
+      "총류": "https://script.google.com/macros/s/AKfycbzKGn2zNpYVUdA3tySgD-SVKbZqBHO1fx-9Lljli0rx0oSrsP-h04nmawRA80fmckeC/exec",
+      "한국문학": "https://script.google.com/macros/s/AKfycbw9p1OmipoctyP1tZJ4dOuDJUCFzyVgljfrE2z9Zw5m7l0oXjo-TkenJqiF78FOjihD/exec"
     };
 
-    window.addEventListener('DOMContentLoaded', () => {
-      loadFromCache();
-      lucide.createIcons();
-      updatePartTabUI();
-      
-      if (!songs || songs.length === 0) {
-        showLoadingUI();
-      }
-      fetchSongs();
-    });
+    const BOOK_GENRES = [
+      "종교", "철학", "사회과학", "자연과학", "기술과학", 
+      "예술", "언어", "한국문학", "외국문학", "역사", "총류"
+    ];
 
-    function loadFromCache() {
-      try {
-        const cached = localStorage.getItem(CACHE_KEY);
-        if (cached) {
-          songs = JSON.parse(cached);
-          isDataLoaded = true;
-          renderSongList();
-        }
-      } catch (e) {
-        console.warn("캐시 로드 실패", e);
-      }
+    let selectedGenre = "";
+    let CURRENT_USER_ID = localStorage.getItem("BOOK_CURRENT_USER_ID") || null;
+    let ADMIN_PASSWORD = localStorage.getItem("BOOK_ADMIN_PW") || "1234";
+    let isAdminLoggedIn = false;
+
+    let availableBookTitles = [];
+    let currentBookData = {
+      title: "",
+      author: "",
+      rows: [],
+      tree: null
+    };
+
+    let cloudBookmarks = {};
+    let cloudReadingProgress = {};
+    let selectedLeafNode = null;
+    let currentSlideIdx = 0;
+
+    let isInlineEditing = false;
+    let ttsUtterance = null;
+    let isTTSPlaying = false;
+    let isTTSPaused = false;
+
+    let parsedSlideList = [];
+
+    function getActiveApiUrl() {
+      return GENRE_API_URLS[selectedGenre] || GENRE_API_URLS["종교"];
     }
 
-    async function fetchSongs() {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6000);
-
-      try {
-        const res = await fetch(SCRIPT_URL, { signal: controller.signal });
-        clearTimeout(timeoutId);
-        
-        const data = await res.json();
-        songs = Array.isArray(data) ? data : [];
-        isDataLoaded = true;
-        
-        localStorage.setItem(CACHE_KEY, JSON.stringify(songs));
-        renderSongList();
-      } catch (err) {
-        console.error(err);
-        isDataLoaded = true;
-        if (!songs || songs.length === 0) {
-          renderEmptyList("등록된 찬양곡이 없거나 불러오는 데 지연되고 있습니다.");
-        }
-      }
+    function initGenreDropdown() {
+      updateGenreDropdownCounts();
+      resetViewerToInitialState();
     }
 
-    function showLoadingUI() {
-      const container = document.getElementById('songList');
-      container.innerHTML = `
-        <div class="py-12 text-center text-slate-400">
-          <i data-lucide="loader-2" class="w-6 h-6 mx-auto mb-2 animate-spin text-indigo-500"></i>
-          <p class="text-xs sm:text-sm font-medium">찬양곡 목록을 확인하고 있습니다...</p>
-        </div>
-      `;
-      lucide.createIcons();
-    }
+    function updateGenreDropdownCounts() {
+      const dropdown = document.getElementById("genreSelectDropdown");
+      if (!dropdown) return;
+      const curVal = dropdown.value || selectedGenre;
 
-    function renderEmptyList(msg) {
-      const container = document.getElementById('songList');
-      container.innerHTML = `
-        <div class="py-10 px-4 text-center text-slate-400">
-          <i data-lucide="music" class="w-8 h-8 mx-auto mb-2 opacity-25"></i>
-          <p class="text-xs sm:text-sm font-medium">${msg || '등록된 찬양곡이 없습니다.'}</p>
-        </div>
-      `;
-      lucide.createIcons();
-    }
+      dropdown.innerHTML = `<option value="">📁 분야 선택</option>`;
 
-    function renderError(message) {
-      const container = document.getElementById('songList');
-      container.innerHTML = `
-        <div class="py-10 px-4 text-center text-rose-500">
-          <i data-lucide="alert-circle" class="w-7 h-7 mx-auto mb-2 text-rose-400"></i>
-          <p class="text-xs sm:text-sm font-semibold">${message}</p>
-        </div>
-      `;
-      lucide.createIcons();
-    }
+      BOOK_GENRES.forEach(g => {
+        const opt = document.createElement("option");
+        opt.value = g;
 
-    function changePart(part) {
-      currentPart = part;
-      updatePartTabUI();
-      
-      if (!isDataLoaded && (!songs || songs.length === 0)) {
-        showLoadingUI();
-      } else {
-        renderSongList();
-      }
-    }
+        let countText = "";
+        try {
+          const cachedStr = localStorage.getItem(`CACHE_LIST_${g}`);
+          if (cachedStr) {
+            const arr = JSON.parse(cachedStr);
+            if (Array.isArray(arr)) {
+              countText = ` (${arr.length}권)`;
+            }
+          }
+        } catch(e) {}
 
-    function updatePartTabUI() {
-      const partButtons = document.querySelectorAll('.part-btn');
-      partButtons.forEach(btn => {
-        const part = btn.dataset.part;
-        const theme = PART_THEMES[part];
-        if (currentPart && part === currentPart) {
-          btn.className = `part-btn py-2 text-center rounded-xl text-xs sm:text-sm font-bold border transition-all duration-200 ${theme.active}`;
-        } else {
-          btn.className = `part-btn py-2 text-center rounded-xl text-xs sm:text-sm font-bold border transition-all duration-200 ${theme.inactive}`;
-        }
+        opt.textContent = `📁 ${g}${countText}`;
+        dropdown.appendChild(opt);
       });
+
+      if (curVal && BOOK_GENRES.includes(curVal)) {
+        dropdown.value = curVal;
+      }
     }
 
-    function openSongLink(songId, link, part) {
-      if (!link) return;
-      window.open(link, '_blank');
+    function resetViewerToInitialState() {
+      const bookDropdown = document.getElementById("bookSelectDropdown");
+      const sContent = document.getElementById("slideContent");
+      const treeCont = document.getElementById("treeContainer");
+      const breadcrumb = document.getElementById("breadcrumbContainer");
+      const badge = document.getElementById("syncStatusBadge");
+      const authorDisplay = document.getElementById("bookAuthorDisplay");
 
-      const song = songs.find(s => String(s.id) === String(songId));
-      if (song) {
-        if (!song.views || typeof song.views !== 'object') {
-          let initVal = typeof song.views === 'number' ? song.views : 0;
-          song.views = { all: initVal, soprano: 0, alto: 0, tenor: 0, bass: 0 };
-        }
-        song.views[part] = (Number(song.views[part]) || 0) + 1;
-        
-        const viewEl = document.getElementById(`views-${songId}`);
-        if (viewEl) viewEl.textContent = song.views[part];
-
-        // 변경된 카운트를 로컬 캐시에도 동기화
-        localStorage.setItem(CACHE_KEY, JSON.stringify(songs));
+      if (bookDropdown) {
+        bookDropdown.disabled = true;
+        bookDropdown.innerHTML = `<option value="">먼저 분야를 선택해주세요</option>`;
+      }
+      if (treeCont) {
+        treeCont.innerHTML = `<div class="p-6 text-center text-xs text-stone-400">상단에서 도서 분야를 먼저 선택해주세요.</div>`;
+      }
+      if (sContent) {
+        sContent.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-stone-400 text-xs sm:text-sm p-8 text-center">
+            <i class="fa-solid fa-book-open text-3xl text-amber-700/40 mb-3"></i>
+            <p class="font-bold text-stone-600 mb-1">도서 분류 체계를 선택해주세요</p>
+            <p class="text-xs text-stone-400">상단 드롭다운에서 분야를 선택하거나 '도서 검색' 버튼으로 원하는 책을 찾아보세요.</p>
+          </div>
+        `;
+      }
+      if (breadcrumb) {
+        breadcrumb.innerHTML = `<span>도서 분야를 선택해주세요.</span>`;
+      }
+      if (badge) {
+        badge.textContent = "대기";
+        badge.className = "hidden sm:inline-block text-[10px] px-1.5 py-0.5 rounded bg-stone-200/70 text-stone-600 font-semibold flex-shrink-0";
+      }
+      if (authorDisplay) {
+        authorDisplay.innerHTML = `<i class="fa-solid fa-user-pen mr-0.5 text-stone-400"></i>저자`;
       }
 
-      fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'increment_view', id: String(songId), part: part })
-      }).catch(err => console.error('파트별 조회수 전송 오류:', err));
+      const curNum = document.getElementById("currentSlideNum");
+      const totNum = document.getElementById("totalSlideNum");
+      if (curNum) curNum.textContent = 0;
+      if (totNum) totNum.textContent = 0;
+      updateOverallProgress();
     }
 
-    // 당일 자정 기준 지난 날짜인지 확인하는 함수
-    function isPastDate(dateStr) {
-      if (!dateStr) return false;
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const target = new Date(dateStr);
-      if (isNaN(target.getTime())) return false;
-      target.setHours(0, 0, 0, 0);
-
-      return target < today;
-    }
-
-    function renderSongList() {
-      if (!currentPart) return;
-      const container = document.getElementById('songList');
-      const theme = PART_THEMES[currentPart];
-      
-      const sortedSongs = [...songs].sort((a, b) => new Date(b.date) - new Date(a.date));
-
-      if (sortedSongs.length === 0) {
-        renderEmptyList('등록된 찬양곡이 없습니다.');
+    function onGenreChange(newGenre) {
+      if (!newGenre) {
+        selectedGenre = "";
+        resetViewerToInitialState();
         return;
       }
 
-      container.innerHTML = sortedSongs.map(song => {
-        const link = song.links ? song.links[currentPart] : '';
-        const hasLink = link && link.trim() !== '';
-        const past = isPastDate(song.date);
-        
-        // --- 조회수 안전 파싱 로직 ---
-        let viewCount = 0;
-        let viewsObj = song.views;
+      selectedGenre = newGenre;
+      localStorage.setItem("BOOK_SELECTED_GENRE", newGenre);
 
-        if (typeof viewsObj === 'string') {
+      stopTTS();
+      cancelInlineEdit();
+      selectedLeafNode = null;
+      currentSlideIdx = 0;
+      currentBookData = { title: "", author: "", rows: [], tree: null };
+
+      const bookDropdown = document.getElementById("bookSelectDropdown");
+      if (bookDropdown) {
+        bookDropdown.disabled = false;
+        bookDropdown.innerHTML = `<option value="">'${newGenre}' 도서 목록 불러오는 중...</option>`;
+      }
+
+      loadBookList();
+    }
+
+    async function loadBookList(retryCount = 0, targetBookTitle = null, targetLocation = null) {
+      if (!selectedGenre) return;
+
+      const dropdown = document.getElementById("bookSelectDropdown");
+      const badge = document.getElementById("syncStatusBadge");
+      const icon = document.getElementById("refreshIcon");
+      const apiUrl = getActiveApiUrl();
+
+      const listCacheKey = `CACHE_LIST_${selectedGenre}`;
+      const cachedListStr = localStorage.getItem(listCacheKey);
+      if (cachedListStr && retryCount === 0) {
+        try {
+          availableBookTitles = JSON.parse(cachedListStr);
+          populateBookDropdown(availableBookTitles, false, targetBookTitle, targetLocation);
+          updateGenreDropdownCounts();
+        } catch(e) {
+          localStorage.removeItem(listCacheKey);
+        }
+      }
+
+      if (badge) {
+        badge.textContent = retryCount > 0 ? "재연결 중..." : "동기화 중...";
+        badge.className = "text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 font-semibold";
+      }
+      if (icon) icon.classList.add("fa-spin");
+
+      try {
+        const params = new URLSearchParams({
+          action: 'get_book_list',
+          t: Date.now()
+        });
+
+        const res = await fetch(`${apiUrl}${apiUrl.includes('?') ? '&' : '?'}${params.toString()}`);
+        const rawText = await res.text();
+        
+        if (rawText.trim().startsWith("<")) {
+          throw new Error("Apps Script 웹 앱 배포 권한을 '모든 사용자(Anyone)'로 설정해주세요.");
+        }
+
+        const json = JSON.parse(rawText);
+
+        if (json.success && Array.isArray(json.bookTitles) && json.bookTitles.length > 0) {
+          availableBookTitles = json.bookTitles;
+          localStorage.setItem(listCacheKey, JSON.stringify(availableBookTitles));
+          populateBookDropdown(availableBookTitles, true, targetBookTitle, targetLocation);
+          updateGenreDropdownCounts();
+
+          if (badge) {
+            badge.textContent = "완료";
+            badge.className = "text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-semibold";
+          }
+        } else {
+          if (retryCount < 1) {
+            setTimeout(() => loadBookList(retryCount + 1, targetBookTitle, targetLocation), 800);
+            return;
+          }
+          handleEmptyBooks(`[${selectedGenre}] 분야에 등록된 도서 시트가 없습니다.`);
+        }
+      } catch (err) {
+        console.error("도서 목록 로드 실패:", err);
+        if (retryCount < 1) {
+          setTimeout(() => loadBookList(retryCount + 1, targetBookTitle, targetLocation), 1000);
+          return;
+        }
+
+        if (badge) {
+          badge.textContent = "연결 실패";
+          badge.className = "text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-semibold";
+        }
+        if (!cachedListStr) {
+          handleEmptyBooks(`[${selectedGenre}] 시트에 연결할 수 없습니다.<br><span class='text-xs text-stone-400'>(${escapeHtml(err.message)})</span>`);
+        }
+      } finally {
+        if (icon) icon.classList.remove("fa-spin");
+      }
+    }
+
+    function populateBookDropdown(titles, isFromServer = false, targetBookTitle = null, targetLocation = null) {
+      const dropdown = document.getElementById("bookSelectDropdown");
+      if (!dropdown) return;
+
+      dropdown.disabled = false;
+      const currentVal = dropdown.value;
+      dropdown.innerHTML = "";
+      titles.forEach(title => {
+        const opt = document.createElement("option");
+        opt.value = title;
+        opt.textContent = `📚 ${title}`;
+        dropdown.appendChild(opt);
+      });
+
+      const lastKey = `LAST_BOOK_${selectedGenre}`;
+      const savedBook = localStorage.getItem(lastKey);
+      let targetBook = targetBookTitle || ((savedBook && titles.includes(savedBook)) ? savedBook : titles[0]);
+
+      dropdown.value = currentVal && titles.includes(currentVal) && !targetBookTitle ? currentVal : targetBook;
+
+      if (!isFromServer && targetBook) {
+        loadBookData(targetBook, false, targetLocation);
+      } else if (isFromServer && (!currentBookData.title || currentBookData.title !== dropdown.value || targetLocation)) {
+        loadBookData(dropdown.value, false, targetLocation);
+      }
+    }
+
+    async function loadBookData(bookTitle, forceRefresh = false, targetLocation = null) {
+      if (!bookTitle) return;
+
+      const badge = document.getElementById("syncStatusBadge");
+      const icon = document.getElementById("refreshIcon");
+      const sContent = document.getElementById("slideContent");
+      const apiUrl = getActiveApiUrl();
+
+      stopTTS();
+      cancelInlineEdit();
+      selectedLeafNode = null;
+      currentSlideIdx = 0;
+
+      const localKey = `CACHE_DATA_${selectedGenre}_${bookTitle}`;
+
+      if (!forceRefresh) {
+        const cachedBook = localStorage.getItem(localKey);
+        if (cachedBook) {
           try {
-            viewsObj = JSON.parse(viewsObj);
-          } catch (e) {
-            if (!isNaN(viewsObj)) {
-              viewsObj = Number(viewsObj);
+            const json = JSON.parse(cachedBook);
+            applyBookDataToUI(bookTitle, json, targetLocation);
+            if (badge) {
+              badge.textContent = "완료";
+              badge.className = "text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-semibold";
+            }
+            return;
+          } catch(e) {
+            localStorage.removeItem(localKey);
+          }
+        }
+      }
+
+      if (badge) {
+        badge.textContent = "로드 중...";
+        badge.className = "text-[10px] px-1.5 py-0.5 rounded bg-indigo-100 text-indigo-700 font-semibold";
+      }
+      if (icon) icon.classList.add("fa-spin");
+      if (sContent) {
+        sContent.innerHTML = `<div class="h-full flex flex-col items-center justify-center p-8 text-center text-stone-400 text-xs sm:text-sm"><i class="fa-solid fa-spinner fa-spin text-xl text-emerald-700 mb-2"></i>'${escapeHtml(bookTitle)}' 도서를 불러오는 중입니다...</div>`;
+      }
+
+      try {
+        const params = new URLSearchParams({
+          action: 'get_book_data',
+          bookTitle: bookTitle,
+          t: Date.now()
+        });
+
+        const res = await fetch(`${apiUrl}${apiUrl.includes('?') ? '&' : '?'}${params.toString()}`);
+        const rawText = await res.text();
+
+        if (rawText.trim().startsWith("<")) {
+          throw new Error("서버에서 HTML 에러 페이지를 반환했습니다. 배포 권한 또는 도서명을 확인해주세요.");
+        }
+
+        const json = JSON.parse(rawText);
+
+        if (json.success) {
+          localStorage.setItem(localKey, JSON.stringify(json));
+          applyBookDataToUI(bookTitle, json, targetLocation);
+          if (badge) {
+            badge.textContent = "완료";
+            badge.className = "text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-semibold";
+          }
+        } else {
+          throw new Error(json.error || "도서 데이터를 읽을 수 없습니다.");
+        }
+      } catch (err) {
+        console.error("도서 데이터 로드 에러:", err);
+        if (badge) {
+          badge.textContent = "로드 실패";
+          badge.className = "text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-semibold";
+        }
+        if (sContent) {
+          sContent.innerHTML = `<div class="h-full flex flex-col items-center justify-center p-8 text-center text-rose-600 text-xs sm:text-sm leading-relaxed">
+            <i class="fa-solid fa-triangle-exclamation text-xl mb-2"></i>
+            <strong>도서 데이터를 불러올 수 없습니다.</strong><br>
+            <span class="text-stone-500 text-xs mt-1 inline-block">${escapeHtml(err.message)}</span><br>
+            <button onclick="loadBookData('${escapeHtml(bookTitle)}', true)" class="mt-3 px-3 py-1 bg-stone-200 hover:bg-stone-300 text-stone-800 rounded text-xs font-bold transition">다시 시도</button>
+          </div>`;
+        }
+      } finally {
+        if (icon) icon.classList.remove("fa-spin");
+      }
+    }
+
+    function applyBookDataToUI(bookTitle, json, targetLocation = null) {
+      localStorage.setItem(`LAST_BOOK_${selectedGenre}`, bookTitle);
+      currentBookData.title = bookTitle;
+      currentBookData.rows = json.data || [];
+
+      const firstRow = currentBookData.rows[0];
+      currentBookData.author = (firstRow && firstRow.author) ? firstRow.author : "저자 미상";
+
+      cloudBookmarks = json.bookmarks || {};
+      cloudReadingProgress = json.readingProgress || {};
+
+      const bDropdown = document.getElementById("bookSelectDropdown");
+      if (bDropdown && bDropdown.value !== bookTitle) {
+        bDropdown.value = bookTitle;
+      }
+
+      processCurrentBookTree(targetLocation);
+    }
+
+    function onBookChange(newBookTitle) {
+      loadBookData(newBookTitle);
+    }
+
+    function reloadCurrentBookData() {
+      const keys = Object.keys(localStorage);
+      keys.forEach(k => {
+        if (k.startsWith("CACHE_")) localStorage.removeItem(k);
+      });
+
+      updateGenreDropdownCounts();
+
+      const dropdown = document.getElementById("bookSelectDropdown");
+      const bTitle = dropdown ? dropdown.value : currentBookData.title;
+      if (bTitle) {
+        loadBookData(bTitle, true);
+      } else if (selectedGenre) {
+        loadBookList();
+      }
+    }
+
+    function handleEmptyBooks(msg) {
+      const dropdown = document.getElementById("bookSelectDropdown");
+      const sContent = document.getElementById("slideContent");
+      const treeCont = document.getElementById("treeContainer");
+      const badge = document.getElementById("syncStatusBadge");
+      const authorDisplay = document.getElementById("bookAuthorDisplay");
+
+      if (dropdown) dropdown.innerHTML = `<option value="">등록된 도서 없음</option>`;
+      if (authorDisplay) authorDisplay.innerHTML = `<i class="fa-solid fa-user-pen mr-0.5 text-stone-400"></i>저자 없음`;
+      if (badge) {
+        badge.textContent = "도서 없음";
+        badge.className = "text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-semibold";
+      }
+      if (sContent) {
+        sContent.innerHTML = `<div class="h-full flex flex-col items-center justify-center p-8 text-center text-stone-400 text-xs sm:text-sm leading-relaxed">${msg || `[${selectedGenre}] 분야에 등록된 도서가 없습니다.`}</div>`;
+      }
+      if (treeCont) {
+        treeCont.innerHTML = `<div class="p-4 text-center text-xs text-stone-400">목차가 없습니다.</div>`;
+      }
+      const curNum = document.getElementById("currentSlideNum");
+      const totNum = document.getElementById("totalSlideNum");
+      if (curNum) curNum.textContent = 0;
+      if (totNum) totNum.textContent = 0;
+      updateOverallProgress();
+    }
+
+    function processCurrentBookTree(targetLocation = null) {
+      const authorDisplay = document.getElementById("bookAuthorDisplay");
+      if (authorDisplay) {
+        authorDisplay.innerHTML = `<i class="fa-solid fa-user-pen mr-1 text-stone-400"></i>${escapeHtml(currentBookData.author)}`;
+      }
+
+      const rows = currentBookData.rows;
+      const frontMatter = [];
+      const backMatter = [];
+      const partMap = new Map();
+
+      const isAuthorKeyword = (s) => /지은이|저자\s*소개|author/i.test(s);
+      const isPrologueKeyword = (s) => /프롤로그|들어가는\s*글|머리말|서문|여는\s*글|추천사|prologue|preface/i.test(s);
+      const isEpilogueKeyword = (s) => /에필로그|맺음말|나가는\s*글|닫는\s*글|후기|epilogue/i.test(s);
+      const isAppendixKeyword = (s) => /부록|참고자료|주석|appendix/i.test(s);
+
+      rows.forEach(r => {
+        const partStr = (r.part || '').trim();
+        const chapStr = (r.chapter || '').trim();
+        const secStr = (r.section || '').trim();
+        const subStr = (r.subsection || '').trim();
+        const fullStr = `${partStr} ${chapStr}${secStr}`;
+
+        const slideItem = {
+          rowIndex: r.rowIndex,
+          order: Number(r.slideOrder) || 1,
+          title: (r.slideTitle || '').trim(),
+          body: r.slideBody || '',
+          rawRow: r,
+          parentType: ""
+        };
+
+        if (isAuthorKeyword(fullStr)) {
+          let node = frontMatter.find(n => n.type === "지은이");
+          if (!node) {
+            node = { id: `front-author`, type: "지은이", title: partStr || "지은이 소개", slides: [], children: [] };
+            frontMatter.push(node);
+          }
+          slideItem.parentType = "지은이";
+          node.slides.push(slideItem);
+          return;
+        }
+
+        if (isPrologueKeyword(fullStr)) {
+          let node = frontMatter.find(n => n.type === "프롤로그");
+          if (!node) {
+            node = { id: `front-prologue`, type: "프롤로그", title: partStr || "프롤로그", slides: [], children: [] };
+            frontMatter.push(node);
+          }
+          slideItem.parentType = "프롤로그";
+          node.slides.push(slideItem);
+          return;
+        }
+
+        if (isEpilogueKeyword(fullStr)) {
+          let node = backMatter.find(n => n.type === "에필로그");
+          if (!node) {
+            node = { id: `back-epilogue`, type: "에필로그", title: partStr || "에필로그", slides: [], children: [] };
+            backMatter.push(node);
+          }
+          slideItem.parentType = "에필로그";
+          node.slides.push(slideItem);
+          return;
+        }
+
+        if (isAppendixKeyword(fullStr)) {
+          let node = backMatter.find(n => n.type === "부록");
+          if (!node) {
+            node = { id: `back-appendix`, type: "부록", title: partStr || "부록", slides: [], children: [] };
+            backMatter.push(node);
+          }
+          slideItem.parentType = "부록";
+          node.slides.push(slideItem);
+          return;
+        }
+
+        const pKey = partStr || "본문";
+        if (!partMap.has(pKey)) {
+          partMap.set(pKey, { type: "편", name: pKey, chapters: new Map(), slides: [] });
+        }
+        const pObj = partMap.get(pKey);
+
+        if (!chapStr && !secStr && !subStr) {
+          slideItem.parentType = "편";
+          pObj.slides.push(slideItem);
+          return;
+        }
+
+        const cKey = chapStr;
+        if (!pObj.chapters.has(cKey)) {
+          pObj.chapters.set(cKey, { type: "장", name: cKey, sections: new Map(), slides: [] });
+        }
+        const cObj = pObj.chapters.get(cKey);
+
+        if (!secStr && !subStr) {
+          slideItem.parentType = "장";
+          cObj.slides.push(slideItem);
+          return;
+        }
+
+        const sKey = secStr;
+        if (!cObj.sections.has(sKey)) {
+          cObj.sections.set(sKey, { type: "절", name: sKey, subsections: new Map(), slides: [] });
+        }
+        const sObj = cObj.sections.get(sKey);
+
+        if (!subStr) {
+          slideItem.parentType = "절";
+          sObj.slides.push(slideItem);
+          return;
+        }
+
+        if (!sObj.subsections.has(subStr)) {
+          sObj.subsections.set(subStr, { type: "관", name: subStr, slides: [] });
+        }
+        slideItem.parentType = "관";
+        sObj.subsections.get(subStr).slides.push(slideItem);
+      });
+
+      const mainTree = [];
+      for (const [pName, pVal] of partMap.entries()) {
+        const pNode = {
+          id: `p-${pName}`,
+          type: "편",
+          title: pName,
+          slides: pVal.slides.sort((a,b) => a.order - b.order),
+          children: []
+        };
+
+        for (const [cName, cVal] of pVal.chapters.entries()) {
+          const cNode = {
+            id: `c-${pName}-${cName}`,
+            type: "장",
+            title: cName,
+            slides: cVal.slides.sort((a,b) => a.order - b.order),
+            children: []
+          };
+
+          for (const [sName, sVal] of cVal.sections.entries()) {
+            const sNode = {
+              id: `s-${pName}-${cName}-${sName}`,
+              type: "절",
+              title: sName,
+              slides: sVal.slides.sort((a,b) => a.order - b.order),
+              children: []
+            };
+
+            for (const [subName, subVal] of sVal.subsections.entries()) {
+              sNode.children.push({
+                id: `sub-${pName}-${cName}-${sName}-${subName}`,
+                type: "관",
+                title: subName,
+                slides: subVal.slides.sort((a,b) => a.order - b.order),
+                children: []
+              });
+            }
+            cNode.children.push(sNode);
+          }
+          pNode.children.push(cNode);
+        }
+        mainTree.push(pNode);
+      }
+
+      frontMatter.forEach(n => n.slides.sort((a,b) => a.order - b.order));
+      backMatter.forEach(n => n.slides.sort((a,b) => a.order - b.order));
+
+      currentBookData.tree = [...frontMatter, ...mainTree, ...backMatter];
+
+      let targetNode = null;
+      let targetSlideIndex = 0;
+
+      if (targetLocation) {
+        let expectedId = "";
+        if (targetLocation.cat === "author") expectedId = "front-author";
+        else if (targetLocation.cat === "prologue") expectedId = "front-prologue";
+        else if (targetLocation.cat === "epilogue") expectedId = "back-epilogue";
+        else if (targetLocation.cat === "appendix") expectedId = "back-appendix";
+        else {
+          const p = targetLocation.part || "본문";
+          const c = targetLocation.chapter;
+          const s = targetLocation.section;
+          const sub = targetLocation.subsection;
+          if (sub) expectedId = `sub-${p}-${c}-${s}-${sub}`;
+          else if (s) expectedId = `s-${p}-${c}-${s}`;
+          else if (c) expectedId = `c-${p}-${c}`;
+          else expectedId = `p-${p}`;
+        }
+
+        function findTarget(nodes) {
+          for (const n of nodes) {
+            if (n.id === expectedId) return n;
+            if (n.children && n.children.length > 0) {
+              const res = findTarget(n.children);
+              if (res) return res;
+            }
+          }
+          return null;
+        }
+
+        targetNode = findTarget(currentBookData.tree);
+
+        if (targetNode && targetNode.slides && targetNode.slides.length > 0) {
+          const orderNum = Number(targetLocation.slideOrder) || 1;
+          const sIdx = targetNode.slides.findIndex(s => s.order === orderNum);
+          targetSlideIndex = sIdx !== -1 ? sIdx : targetNode.slides.length - 1;
+
+          function expandAncestors(nodes, targetId) {
+            for (let n of nodes) {
+              if (n.id === targetId) return true;
+              if (n.children && n.children.length > 0) {
+                if (expandAncestors(n.children, targetId)) {
+                  n._collapsed = false;
+                  return true;
+                }
+              }
+            }
+            return false;
+          }
+          expandAncestors(currentBookData.tree, targetNode.id);
+        }
+      }
+
+      renderTree(currentBookData.tree);
+      updateOverallProgress();
+
+      if (targetNode && targetNode.slides && targetNode.slides.length > 0) {
+        selectNode(targetNode, targetSlideIndex, false);
+      } else {
+        const firstSelectable = findFirstSelectable(currentBookData.tree);
+        if (firstSelectable) {
+          selectNode(firstSelectable, 0, false);
+        }
+      }
+    }
+
+    function findFirstSelectable(nodes) {
+      if (!nodes || nodes.length === 0) return null;
+      for (const n of nodes) {
+        if (n.slides && n.slides.length > 0) return n;
+        if (n.children && n.children.length > 0) {
+          const found = findFirstSelectable(n.children);
+          if (found) return found;
+        }
+      }
+      return nodes[0];
+    }
+
+    function getNodeTheme(type) {
+      switch (type) {
+        case "편":
+          return { text: "text-purple-800", bg: "bg-purple-50", border: "border-purple-200", badge: "bg-purple-100 text-purple-800 border-purple-200", icon: "fa-book-bookmark", iconBg: "bg-purple-100 text-purple-700", dotColor: "bg-purple-600" };
+        case "장":
+          return { text: "text-blue-800", bg: "bg-blue-50", border: "border-blue-200", badge: "bg-blue-100 text-blue-800 border-blue-200", icon: "fa-folder-open", iconBg: "bg-blue-100 text-blue-700", dotColor: "bg-blue-600" };
+        case "절":
+          return { text: "text-teal-800", bg: "bg-teal-50", border: "border-teal-200", badge: "bg-teal-100 text-teal-800 border-teal-200", icon: "fa-file-lines", iconBg: "bg-teal-100 text-teal-700", dotColor: "bg-teal-600" };
+        case "관":
+          return { text: "text-amber-800", bg: "bg-amber-50", border: "border-amber-200", badge: "bg-amber-100 text-amber-800 border-amber-200", icon: "fa-layer-group", iconBg: "bg-amber-100 text-amber-700", dotColor: "bg-amber-600" };
+        default:
+          return { text: "text-indigo-800", bg: "bg-indigo-50", border: "border-indigo-200", badge: "bg-indigo-100 text-indigo-800 border-indigo-200", icon: "fa-feather", iconBg: "bg-indigo-100 text-indigo-700", dotColor: "bg-indigo-600" };
+      }
+    }
+
+    function renderTree(treeList) {
+      const container = document.getElementById("treeContainer");
+      if (!container) return;
+      container.innerHTML = "";
+
+      if (!treeList || treeList.length === 0) {
+        container.innerHTML = `<div class="p-4 text-center text-xs text-stone-400">목차 항목이 없습니다.</div>`;
+        return;
+      }
+
+      const ul = document.createElement("ul");
+      ul.className = "space-y-1";
+      treeList.forEach(node => ul.appendChild(createNodeDOM(node, 0)));
+      container.appendChild(ul);
+    }
+
+    function createNodeDOM(node, depth) {
+      const li = document.createElement("li");
+      const hasChildren = node.children && node.children.length > 0;
+      const hasSlides = node.slides && node.slides.length > 0;
+      const isSelected = selectedLeafNode && selectedLeafNode.id === node.id;
+      const theme = getNodeTheme(node.type);
+      const isDone = isNodeCompleted(node.id);
+
+      const row = document.createElement("div");
+      row.className = `group flex items-center justify-between px-2 py-1.5 rounded-lg text-xs transition cursor-pointer select-none ${
+        isSelected 
+          ? `${theme.bg} border ${theme.border} font-bold ${theme.text} shadow-xs` 
+          : 'hover:bg-stone-200/50 text-stone-700 border border-transparent'
+      }`;
+      row.style.paddingLeft = `${depth * 14 + 6}px`;
+
+      row.onclick = (e) => {
+        if (hasSlides) {
+          selectNode(node, 0, true);
+          if (window.innerWidth < 1024) {
+            toggleMobileSidebar();
+          }
+        } else if (hasChildren) {
+          node._collapsed = !node._collapsed;
+          renderTree(currentBookData.tree);
+        }
+      };
+
+      const left = document.createElement("div");
+      left.className = "flex items-center gap-1.5 overflow-hidden flex-1 min-w-0 pr-1";
+
+      left.innerHTML += `<span class="px-1.5 py-0.2 rounded text-[9px] font-bold border flex-shrink-0 ${theme.badge}">${node.type}</span>`;
+      left.innerHTML += `<span class="break-keep leading-snug font-medium flex-1 truncate ${isDone ? 'text-stone-900 font-bold' : ''}">${escapeHtml(node.title)}</span>`;
+      row.appendChild(left);
+
+      const right = document.createElement("div");
+      right.className = "flex items-center gap-1 flex-shrink-0 ml-1";
+
+      if (isDone) {
+        right.innerHTML += `
+          <span class="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-700 text-white shadow-2xs" title="완독 완료">
+            <i class="fa-solid fa-check text-[7px] mr-0.5"></i>완독
+          </span>
+        `;
+      }
+
+      if (hasSlides) {
+        right.innerHTML += `<span class="text-[9px] font-semibold ${theme.text} ${theme.bg} border ${theme.border} px-1.5 py-0.2 rounded-full" title="등록된 슬라이드 수"><i class="fa-regular fa-clone mr-0.5"></i>${node.slides.length}</span>`;
+      }
+
+      if (hasChildren) {
+        const toggleBtn = document.createElement("button");
+        toggleBtn.type = "button";
+        toggleBtn.className = `w-5 h-5 flex items-center justify-center rounded hover:bg-stone-300/60 text-stone-400 hover:text-stone-700 transition flex-shrink-0 ${
+          node._collapsed ? 'text-stone-400' : 'text-stone-600'
+        }`;
+        toggleBtn.title = node._collapsed ? "이 항목 하위 펼치기" : "이 항목 하위 접기";
+        toggleBtn.innerHTML = `<i class="fa-solid fa-chevron-${node._collapsed ? 'right' : 'down'} text-[10px]"></i>`;
+        
+        toggleBtn.onclick = (e) => {
+          e.stopPropagation();
+          node._collapsed = !node._collapsed;
+          renderTree(currentBookData.tree);
+        };
+        right.appendChild(toggleBtn);
+      } else {
+        right.innerHTML += `<span class="w-5"></span>`;
+      }
+
+      row.appendChild(right);
+      li.appendChild(row);
+
+      if (hasChildren && !node._collapsed) {
+        const childUl = document.createElement("ul");
+        childUl.className = "space-y-1 mt-0.5";
+        node.children.forEach(c => childUl.appendChild(createNodeDOM(c, depth + 1)));
+        li.appendChild(childUl);
+      }
+
+      return li;
+    }
+
+    function selectNode(node, slideIdx = 0, recordPrev = true) {
+      if (recordPrev && selectedLeafNode && selectedLeafNode.slides && selectedLeafNode.slides.length > 0) {
+        const isDifferentPosition = (selectedLeafNode.id !== node.id) || (currentSlideIdx !== slideIdx);
+        if (isDifferentPosition) {
+          recordPreviousSlideBookmark(selectedLeafNode, currentSlideIdx);
+        }
+      }
+
+      stopTTS();
+      cancelInlineEdit();
+      selectedLeafNode = node;
+      currentSlideIdx = slideIdx;
+      renderTree(currentBookData.tree);
+      renderSlideViewer();
+    }
+
+    function isNodeCompleted(nodeId) {
+      if (!CURRENT_USER_ID || !currentBookData.title) return false;
+      const userProg = cloudReadingProgress[CURRENT_USER_ID];
+      if (!userProg || !userProg[currentBookData.title]) return false;
+      return userProg[currentBookData.title].includes(nodeId);
+    }
+
+    async function toggleCurrentNodeProgress() {
+      if (!CURRENT_USER_ID) {
+        alert("완독 체크 기능을 사용하려면 상단에서 회원 로그인이 필요합니다.");
+        openUserLoginModal();
+        return;
+      }
+      if (!selectedLeafNode || !currentBookData.title) return;
+      const nodeId = selectedLeafNode.id;
+      const nodeTitle = selectedLeafNode.title;
+      const currentlyDone = isNodeCompleted(nodeId);
+      const willBeDone = !currentlyDone;
+
+      const btn = document.getElementById("btnToggleNodeProgress");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>동기화 중...</span>`;
+      }
+
+      try {
+        const res = await fetch(getActiveApiUrl(), {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "toggle_node_progress",
+            userId: CURRENT_USER_ID,
+            bookTitle: currentBookData.title,
+            nodeId: nodeId,
+            nodeTitle: nodeTitle,
+            completed: willBeDone
+          })
+        });
+
+        const rawText = await res.text();
+        let json = null;
+        try {
+          json = JSON.parse(rawText);
+        } catch (e) {
+          if (res.ok) json = { success: true, completed: willBeDone };
+        }
+
+        if (json && json.success) {
+          if (!cloudReadingProgress[CURRENT_USER_ID]) cloudReadingProgress[CURRENT_USER_ID] = {};
+          if (!cloudReadingProgress[CURRENT_USER_ID][currentBookData.title]) cloudReadingProgress[CURRENT_USER_ID][currentBookData.title] = [];
+
+          if (willBeDone) {
+            if (!cloudReadingProgress[CURRENT_USER_ID][currentBookData.title].includes(nodeId)) {
+              cloudReadingProgress[CURRENT_USER_ID][currentBookData.title].push(nodeId);
+            }
+          } else {
+            cloudReadingProgress[CURRENT_USER_ID][currentBookData.title] = cloudReadingProgress[CURRENT_USER_ID][currentBookData.title].filter(id => id !== nodeId);
+          }
+
+          const localKey = `CACHE_DATA_${selectedGenre}_${currentBookData.title}`;
+          const cached = localStorage.getItem(localKey);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            parsed.readingProgress = cloudReadingProgress;
+            localStorage.setItem(localKey, JSON.stringify(parsed));
+          }
+
+          renderSlideViewer();
+          renderTree(currentBookData.tree);
+          updateOverallProgress();
+        } else {
+          alert("완독 상태 저장 실패: " + ((json && json.error) || "서버 응답 오류"));
+        }
+      } catch (err) {
+        alert("통신 오류: " + err.message);
+      } finally {
+        if (btn) btn.disabled = false;
+      }
+    }
+
+    async function resetBookProgress() {
+      if (!CURRENT_USER_ID) {
+        alert("로그인 후 완독 초기화가 가능합니다.");
+        openUserLoginModal();
+        return;
+      }
+      if (!currentBookData.title) return;
+      const userProg = cloudReadingProgress[CURRENT_USER_ID] && cloudReadingProgress[CURRENT_USER_ID][currentBookData.title];
+      const currentDones = userProg || [];
+
+      if (currentDones.length === 0) {
+        alert(`회원 ${CURRENT_USER_ID}번의 '${currentBookData.title}' 완독 기록이 없습니다.`);
+        return;
+      }
+
+      if (!confirm(`[회원 ${CURRENT_USER_ID}번] '${currentBookData.title}' 도서의 완독 기록(${currentDones.length}개)을 모두 초기화하시겠습니까?`)) {
+        return;
+      }
+
+      const btn = document.getElementById("btnResetProgress");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-xs"></i>`;
+      }
+
+      try {
+        const res = await fetch(getActiveApiUrl(), {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "reset_book_progress",
+            userId: CURRENT_USER_ID,
+            bookTitle: currentBookData.title
+          })
+        });
+
+        const rawText = await res.text();
+        let json = null;
+        try {
+          json = JSON.parse(rawText);
+        } catch (e) {
+          if (res.ok) json = { success: true };
+        }
+
+        if (json && json.success) {
+          if (cloudReadingProgress[CURRENT_USER_ID]) {
+            cloudReadingProgress[CURRENT_USER_ID][currentBookData.title] = [];
+          }
+
+          const localKey = `CACHE_DATA_${selectedGenre}_${currentBookData.title}`;
+          const cached = localStorage.getItem(localKey);
+          if (cached) {
+            const parsed = JSON.parse(cached);
+            parsed.readingProgress = cloudReadingProgress;
+            localStorage.setItem(localKey, JSON.stringify(parsed));
+          }
+
+          renderSlideViewer();
+          renderTree(currentBookData.tree);
+          updateOverallProgress();
+          alert("완독 기록이 초기화되었습니다.");
+        } else {
+          alert("초기화 실패: " + ((json && json.error) || "서버 응답 오류"));
+        }
+      } catch (err) {
+        alert("통신 오류: " + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-rotate-left text-xs"></i><span class="hidden md:inline">초기화</span>`;
+        }
+      }
+    }
+
+    function updateOverallProgress() {
+      const displayElem = document.getElementById("readingProgressDisplay");
+      const barElem = document.getElementById("readingProgressBar");
+
+      if (!currentBookData.tree) {
+        if (displayElem) displayElem.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i>0% 완독`;
+        if (barElem) barElem.style.width = "0%";
+        return;
+      }
+
+      const slideNodes = getFlattenedSlideNodes();
+      const totalCount = slideNodes.length;
+      
+      let doneCount = 0;
+      if (CURRENT_USER_ID && cloudReadingProgress[CURRENT_USER_ID] && cloudReadingProgress[CURRENT_USER_ID][currentBookData.title]) {
+        const userProg = cloudReadingProgress[CURRENT_USER_ID][currentBookData.title];
+        doneCount = slideNodes.filter(n => userProg.includes(n.id)).length;
+      }
+
+      const percent = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+
+      if (displayElem) {
+        if (CURRENT_USER_ID) {
+          displayElem.innerHTML = `<i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i>${percent}% (${doneCount}/${totalCount})`;
+        } else {
+          displayElem.innerHTML = `<i class="fa-solid fa-user-lock mr-1 text-stone-400"></i>로그인 시 집계`;
+        }
+      }
+      if (barElem) {
+        barElem.style.width = `${percent}%`;
+      }
+    }
+
+    function renderSlideViewer() {
+      if (!selectedLeafNode) return;
+
+      const node = selectedLeafNode;
+      const slides = node.slides || [];
+      const theme = getNodeTheme(node.type);
+
+      const iconBox = document.getElementById("headerTypeIcon");
+      if (iconBox) {
+        iconBox.className = `w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0 ${theme.iconBg}`;
+        iconBox.innerHTML = `<i class="fa-solid ${theme.icon}"></i>`;
+      }
+
+      const headingTitle = document.getElementById("currentHeadingTitle");
+      if (headingTitle) {
+        headingTitle.textContent = node.title;
+        headingTitle.className = `text-sm sm:text-base md:text-lg font-bold truncate transition-colors ${theme.text}`;
+      }
+
+      const typeBadge = document.getElementById("nodeTypeBadge");
+      if (typeBadge) {
+        typeBadge.textContent = `${node.type}`;
+        typeBadge.className = `text-[9px] sm:text-[10px] px-1.5 py-0.2 font-bold rounded-full border ${theme.badge}`;
+      }
+
+      const breadcrumb = document.getElementById("breadcrumbContainer");
+      if (breadcrumb) {
+        const ancestors = getNodeAncestors(node.id);
+        let bcHtml = `<span class="text-indigo-700 font-bold">[${escapeHtml(selectedGenre)}]</span> <span class="text-stone-700 font-bold">${escapeHtml(currentBookData.title)}</span>`;
+        
+        if (ancestors.length > 0) {
+          ancestors.forEach((anc) => {
+            const ancTheme = getNodeTheme(anc.type);
+            bcHtml += `
+              <i class="fa-solid fa-chevron-right text-[8px] text-stone-300"></i>
+              <span class="font-semibold ${ancTheme.text}">${escapeHtml(anc.title)}</span>
+            `;
+          });
+        }
+        breadcrumb.innerHTML = bcHtml;
+      }
+
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const mPrevBtn = document.getElementById("mobilePrevBtn");
+      const mNextBtn = document.getElementById("mobileNextBtn");
+      const btnDelete = document.getElementById("btnDeleteSlide");
+      const btnEdit = document.getElementById("btnStartEdit");
+
+      if (slides.length === 0) {
+        const sHeader = document.getElementById("slideHeaderContainer");
+        if (sHeader) sHeader.classList.add("hidden");
+
+        const sContent = document.getElementById("slideContent");
+        if (sContent) sContent.innerHTML = "<p class='text-stone-400 text-xs sm:text-sm p-4'>이 항목에 등록된 슬라이드가 없습니다.</p>";
+        
+        const curNum = document.getElementById("currentSlideNum");
+        const totNum = document.getElementById("totalSlideNum");
+        if (curNum) curNum.textContent = 0;
+        if (totNum) totNum.textContent = 0;
+
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = true;
+        if (mPrevBtn) mPrevBtn.disabled = true;
+        if (mNextBtn) mNextBtn.disabled = true;
+        if (btnDelete) btnDelete.disabled = true;
+        if (btnEdit) btnEdit.disabled = true;
+        
+        const dots = document.getElementById("dotsContainer");
+        if (dots) dots.innerHTML = "";
+        updateBookmarkButtonUI();
+        stopTTS();
+        cancelInlineEdit();
+        return;
+      }
+
+      if (btnDelete) btnDelete.disabled = false;
+      if (btnEdit) btnEdit.disabled = false;
+
+      if (currentSlideIdx >= slides.length) currentSlideIdx = slides.length - 1;
+      if (currentSlideIdx < 0) currentSlideIdx = 0;
+
+      const cur = slides[currentSlideIdx];
+      const curNum = document.getElementById("currentSlideNum");
+      const totNum = document.getElementById("totalSlideNum");
+      const pageTag = document.getElementById("pageTag");
+      if (curNum) curNum.textContent = currentSlideIdx + 1;
+      if (totNum) totNum.textContent = slides.length;
+      if (pageTag) pageTag.textContent = `Page ${currentSlideIdx + 1} / ${slides.length}`;
+
+      const sHeader = document.getElementById("slideHeaderContainer");
+      const slideTitle = document.getElementById("slideTitle");
+      const tagBadge = document.getElementById("slideTagBadge");
+
+      const hasCustomTitle = cur.title && cur.title.trim() !== "" && cur.title.trim() !== node.title.trim();
+
+      if (hasCustomTitle) {
+        if (sHeader) sHeader.classList.remove("hidden");
+        if (tagBadge) {
+          tagBadge.textContent = `#${cur.order || currentSlideIdx + 1}`;
+          tagBadge.className = `text-[9px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded border ${theme.badge}`;
+        }
+        if (slideTitle) {
+          slideTitle.textContent = cur.title;
+          slideTitle.className = `tts-line-block px-1 text-xs sm:text-sm md:text-[15.5px] font-bold leading-[1.8] transition-colors ${theme.text}`;
+        }
+      } else {
+        if (sHeader) sHeader.classList.add("hidden");
+      }
+      
+      const isLastSlideOfNode = (currentSlideIdx === slides.length - 1);
+      const isNodeDone = isNodeCompleted(node.id);
+      
+      let completeButtonHtml = "";
+      if (isLastSlideOfNode) {
+        completeButtonHtml = `
+          <div class="mt-8 pt-4 border-t border-[#e5dec9] flex flex-col items-center gap-1.5">
+            <button id="btnToggleNodeProgress" onclick="toggleCurrentNodeProgress()" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 shadow-xs ${
+              isNodeDone 
+                ? 'bg-emerald-700 hover:bg-emerald-800 text-white' 
+                : 'bg-[#f4efe6] hover:bg-emerald-50 text-emerald-900 border border-[#d6ccb8]'
+            }">
+              <i class="fa-solid ${isNodeDone ? 'fa-circle-check text-white' : 'fa-check text-emerald-700'}"></i>
+              <span>${
+                CURRENT_USER_ID 
+                  ? (isNodeDone ? `완독 완료됨 (해제 클릭)` : `이 목차 완독 체크`)
+                  : `완독 체크 (로그인 필요)`
+              }</span>
+            </button>
+            <p class="text-[10px] sm:text-[11px] text-stone-400">마지막 슬라이드입니다. 클릭 시 목차 완독 상태가 시트에 저장됩니다.</p>
+          </div>
+        `;
+      } else {
+        completeButtonHtml = `
+          <div class="mt-8 pt-4 border-t border-[#e5dec9] flex justify-center">
+            <span class="text-[10px] sm:text-[11px] text-stone-500 bg-[#f4efe6] px-3 py-1 rounded-md border border-[#e4dccb]">
+              <i class="fa-solid fa-arrow-right text-emerald-700 mr-1"></i>마지막 슬라이드(${slides.length}P)에서 완독 체크가 가능합니다.
+            </span>
+          </div>
+        `;
+      }
+
+      const contentElem = document.getElementById("slideContent");
+      if (contentElem) {
+        contentElem.innerHTML = renderNotionFormattedText(cur.body || "") + completeButtonHtml + "<div class='h-4'></div>";
+        contentElem.scrollTop = 0;
+      }
+
+      const allNodes = getFlattenedSlideNodes();
+      const nodeIdx = allNodes.findIndex(n => n.id === node.id);
+      const hasPrevNode = nodeIdx > 0;
+      const hasNextNode = nodeIdx !== -1 && nodeIdx < allNodes.length - 1;
+
+      const canGoPrev = (currentSlideIdx > 0) || hasPrevNode;
+      const canGoNext = (currentSlideIdx < slides.length - 1) || hasNextNode;
+      
+      if (prevBtn) prevBtn.disabled = !canGoPrev;
+      if (nextBtn) nextBtn.disabled = !canGoNext;
+      if (mPrevBtn) mPrevBtn.disabled = !canGoPrev;
+      if (mNextBtn) mNextBtn.disabled = !canGoNext;
+
+      const dots = document.getElementById("dotsContainer");
+      if (dots) {
+        dots.innerHTML = "";
+        slides.forEach((_, idx) => {
+          const b = document.createElement("button");
+          b.className = `h-1.5 rounded-full transition-all flex-shrink-0 ${
+            idx === currentSlideIdx ? `${theme.dotColor} w-3.5 sm:w-4` : 'bg-[#d6ccb8] w-1.5 hover:bg-stone-400'
+          }`;
+          b.title = `슬라이드 ${idx + 1} 이동`;
+          b.onclick = () => {
+            if (currentSlideIdx !== idx && selectedLeafNode) {
+              recordPreviousSlideBookmark(selectedLeafNode, currentSlideIdx);
+            }
+            currentSlideIdx = idx;
+            renderSlideViewer();
+          };
+          dots.appendChild(b);
+        });
+      }
+
+      updateBookmarkButtonUI();
+      updateAdminUI();
+      updateOverallProgress();
+    }
+
+    function navigateSlide(dir) {
+      if (!selectedLeafNode || !selectedLeafNode.slides) return;
+      stopTTS();
+      cancelInlineEdit();
+
+      const prevNode = selectedLeafNode;
+      const prevIdx = currentSlideIdx;
+
+      const slides = selectedLeafNode.slides;
+      const targetIdx = currentSlideIdx + dir;
+
+      if (targetIdx >= 0 && targetIdx < slides.length) {
+        recordPreviousSlideBookmark(prevNode, prevIdx);
+        currentSlideIdx = targetIdx;
+        renderSlideViewer();
+        return;
+      }
+
+      const allNodes = getFlattenedSlideNodes();
+      const nodeIdx = allNodes.findIndex(n => n.id === selectedLeafNode.id);
+
+      if (dir > 0 && targetIdx >= slides.length) {
+        if (nodeIdx !== -1 && nodeIdx < allNodes.length - 1) {
+          recordPreviousSlideBookmark(prevNode, prevIdx);
+          selectedLeafNode = allNodes[nodeIdx + 1];
+          currentSlideIdx = 0;
+          renderTree(currentBookData.tree);
+          renderSlideViewer();
+        }
+        return;
+      }
+
+      if (dir < 0 && targetIdx < 0) {
+        if (nodeIdx > 0) {
+          recordPreviousSlideBookmark(prevNode, prevIdx);
+          selectedLeafNode = allNodes[nodeIdx - 1];
+          currentSlideIdx = Math.max(0, (selectedLeafNode.slides ? selectedLeafNode.slides.length - 1 : 0));
+          renderTree(currentBookData.tree);
+          renderSlideViewer();
+        }
+      }
+    }
+
+    // 도서 검색 기능
+    function openBookSearchModal() {
+      const modal = document.getElementById("bookSearchModal");
+      const input = document.getElementById("globalBookSearchInput");
+      const listCont = document.getElementById("bookSearchResultList");
+      const countText = document.getElementById("searchResultCountText");
+      if (!modal || !input) return;
+
+      openModal("bookSearchModal");
+      input.value = "";
+      
+      if (countText) countText.textContent = "검색어를 입력해주세요";
+      if (listCont) {
+        listCont.innerHTML = `
+          <div class="p-8 text-center text-stone-400 text-xs sm:text-sm">
+            <i class="fa-solid fa-magnifying-glass text-xl mb-2 text-stone-300"></i>
+            <p class="font-medium text-stone-600">도서명을 검색해보세요</p>
+            <p class="text-[11px] text-stone-400 mt-0.5">원하시는 책 제목의 일부를 입력하시면 결과가 표시됩니다.</p>
+          </div>
+        `;
+      }
+
+      setTimeout(() => input.focus(), 100);
+    }
+
+    function getAllRegisteredBooks() {
+      const bookList = [];
+      const seen = new Set();
+
+      if (selectedGenre && availableBookTitles.length > 0) {
+        availableBookTitles.forEach(title => {
+          const key = `${selectedGenre}___${title}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            bookList.push({ genre: selectedGenre, title: title });
+          }
+        });
+      }
+
+      BOOK_GENRES.forEach(g => {
+        try {
+          const cached = localStorage.getItem(`CACHE_LIST_${g}`);
+          if (cached) {
+            const arr = JSON.parse(cached);
+            if (Array.isArray(arr)) {
+              arr.forEach(title => {
+                const key = `${g}___${title}`;
+                if (!seen.has(key)) {
+                  seen.add(key);
+                  bookList.push({ genre: g, title: title });
+                }
+              });
+            }
+          }
+        } catch(e) {}
+      });
+
+      return bookList;
+    }
+
+    function handleBookSearchQuery(query) {
+      const q = (query || "").trim().toLowerCase();
+      const listCont = document.getElementById("bookSearchResultList");
+      const countText = document.getElementById("searchResultCountText");
+      if (!listCont) return;
+
+      if (!q) {
+        if (countText) countText.textContent = "검색어를 입력해주세요";
+        listCont.innerHTML = `
+          <div class="p-8 text-center text-stone-400 text-xs sm:text-sm">
+            <i class="fa-solid fa-magnifying-glass text-xl mb-2 text-stone-300"></i>
+            <p class="font-medium text-stone-600">도서명을 검색해보세요</p>
+            <p class="text-[11px] text-stone-400 mt-0.5">원하시는 책 제목의 일부를 입력하시면 결과가 표시됩니다.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const allBooks = getAllRegisteredBooks();
+      const filtered = allBooks.filter(b => 
+        b.title.toLowerCase().includes(q) || 
+        b.genre.toLowerCase().includes(q)
+      );
+
+      if (countText) {
+        countText.textContent = `검색 결과: ${filtered.length}권`;
+      }
+
+      if (filtered.length === 0) {
+        listCont.innerHTML = `
+          <div class="p-8 text-center text-stone-400 text-xs sm:text-sm">
+            <i class="fa-solid fa-triangle-exclamation text-xl mb-2 text-amber-400"></i>
+            <p class="font-medium text-stone-600">'${escapeHtml(query)}'에 대한 검색 결과가 없습니다.</p>
+            <p class="text-[11px] text-stone-400 mt-0.5">단어를 바꾸거나 다른 키워드로 검색해보세요.</p>
+          </div>
+        `;
+        return;
+      }
+
+      listCont.innerHTML = "";
+      filtered.forEach(item => {
+        const isCurrent = (item.genre === selectedGenre && item.title === currentBookData.title);
+        const card = document.createElement("div");
+        card.className = `p-2.5 rounded-xl border flex items-center justify-between cursor-pointer transition ${
+          isCurrent 
+            ? 'bg-emerald-50 border-emerald-300 text-emerald-950 font-bold shadow-xs' 
+            : 'bg-white hover:bg-stone-50 border-stone-200 text-stone-800'
+        }`;
+        
+        card.onclick = () => selectBookFromSearch(item.genre, item.title);
+
+        card.innerHTML = `
+          <div class="flex items-center gap-2 min-w-0 pr-2">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200 flex-shrink-0">
+              📁 ${escapeHtml(item.genre)}
+            </span>
+            <div class="min-w-0">
+              <h4 class="text-xs sm:text-sm font-semibold truncate leading-tight">${escapeHtml(item.title)}</h4>
+              ${isCurrent ? `<span class="text-[9px] text-emerald-600 font-bold">현재 열려 있는 도서</span>` : ''}
+            </div>
+          </div>
+          <button class="px-2.5 py-1 text-[11px] font-bold rounded-lg border flex-shrink-0 transition ${
+            isCurrent ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-stone-100 hover:bg-emerald-600 hover:text-white text-stone-600 border-stone-200'
+          }">
+            열기 <i class="fa-solid fa-arrow-right text-[9px] ml-0.5"></i>
+          </button>
+        `;
+
+        listCont.appendChild(card);
+      });
+    }
+
+    function selectBookFromSearch(genre, bookTitle) {
+      closeModal('bookSearchModal');
+
+      if (selectedGenre !== genre) {
+        selectedGenre = genre;
+        localStorage.setItem("BOOK_SELECTED_GENRE", genre);
+        
+        const genreDropdown = document.getElementById("genreSelectDropdown");
+        if (genreDropdown) genreDropdown.value = genre;
+
+        const bookDropdown = document.getElementById("bookSelectDropdown");
+        if (bookDropdown) {
+          bookDropdown.disabled = false;
+          bookDropdown.innerHTML = `<option value="${escapeHtml(bookTitle)}">📚 ${escapeHtml(bookTitle)}</option>`;
+          bookDropdown.value = bookTitle;
+        }
+
+        loadBookList().then(() => {
+          loadBookData(bookTitle, false);
+        });
+      } else {
+        const bookDropdown = document.getElementById("bookSelectDropdown");
+        if (bookDropdown) bookDropdown.value = bookTitle;
+        loadBookData(bookTitle, false);
+      }
+    }
+
+    // 관리자 기능
+    function enableInlineEdit() {
+      if (!isAdminLoggedIn) {
+        alert("슬라이드 수정은 관리자만 가능합니다.");
+        return;
+      }
+      if (!selectedLeafNode || !selectedLeafNode.slides || selectedLeafNode.slides.length === 0) {
+        alert("수정할 슬라이드가 없습니다.");
+        return;
+      }
+      stopTTS();
+      isInlineEditing = true;
+
+      const cur = selectedLeafNode.slides[currentSlideIdx];
+      const viewer = document.getElementById("slideContent");
+      const editorBox = document.getElementById("slideEditContainer");
+      const textarea = document.getElementById("slideEditTextArea");
+
+      const btnStart = document.getElementById("btnStartEdit");
+      const btnSave = document.getElementById("btnSaveEdit");
+      const btnCancel = document.getElementById("btnCancelEdit");
+
+      viewer.classList.add("hidden");
+      editorBox.classList.remove("hidden");
+      editorBox.classList.add("flex");
+      textarea.value = cur.body || "";
+      textarea.focus();
+
+      btnStart.classList.add("hidden");
+      btnSave.classList.remove("hidden");
+      btnSave.classList.add("flex");
+      btnCancel.classList.remove("hidden");
+      btnCancel.classList.add("flex");
+    }
+
+    function cancelInlineEdit() {
+      isInlineEditing = false;
+      const viewer = document.getElementById("slideContent");
+      const editorBox = document.getElementById("slideEditContainer");
+
+      const btnStart = document.getElementById("btnStartEdit");
+      const btnSave = document.getElementById("btnSaveEdit");
+      const btnCancel = document.getElementById("btnCancelEdit");
+
+      if (editorBox) {
+        editorBox.classList.add("hidden");
+        editorBox.classList.remove("flex");
+      }
+      if (viewer) viewer.classList.remove("hidden");
+
+      if (btnStart) btnStart.classList.remove("hidden");
+      if (btnSave) {
+        btnSave.classList.add("hidden");
+        btnSave.classList.remove("flex");
+      }
+      if (btnCancel) {
+        btnCancel.classList.add("hidden");
+        btnCancel.classList.remove("flex");
+      }
+    }
+
+    async function saveInlineEdit() {
+      if (!isAdminLoggedIn) {
+        alert("관리자 권한이 필요합니다.");
+        return;
+      }
+      if (!selectedLeafNode || !selectedLeafNode.slides || selectedLeafNode.slides.length === 0) return;
+      const cur = selectedLeafNode.slides[currentSlideIdx];
+      if (!cur.rowIndex) {
+        alert("행 번호를 찾을 수 없습니다.");
+        return;
+      }
+
+      const newBody = document.getElementById("slideEditTextArea").value;
+      const btnSave = document.getElementById("btnSaveEdit");
+      btnSave.disabled = true;
+      btnSave.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-xs"></i>`;
+
+      try {
+        const res = await fetch(getActiveApiUrl(), {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "update_body",
+            bookTitle: currentBookData.title,
+            rowIndex: cur.rowIndex,
+            slideBody: newBody
+          })
+        });
+
+        const rawText = await res.text();
+        let json = null;
+        try {
+          json = JSON.parse(rawText);
+        } catch (e) {
+          if (res.ok) json = { success: true };
+        }
+
+        if (json && json.success) {
+          cur.body = newBody;
+          if (cur.rawRow) cur.rawRow.slideBody = newBody;
+
+          const localKey = `CACHE_DATA_${selectedGenre}_${currentBookData.title}`;
+          localStorage.setItem(localKey, JSON.stringify({
+            data: currentBookData.rows,
+            bookmarks: cloudBookmarks,
+            readingProgress: cloudReadingProgress
+          }));
+
+          cancelInlineEdit();
+          renderSlideViewer();
+          alert("수정 내용이 해당 도서 시트에 저장되었습니다.");
+        } else {
+          alert("저장 실패: " + ((json && json.error) || "서버 응답 오류"));
+        }
+      } catch (err) {
+        alert("통신 에러: " + err.message);
+      } finally {
+        btnSave.disabled = false;
+        btnSave.innerHTML = `<i class="fa-solid fa-floppy-disk text-[10px]"></i><span>저장</span>`;
+      }
+    }
+
+    async function deleteCurrentSlide() {
+      if (!isAdminLoggedIn) {
+        alert("슬라이드 삭제는 관리자만 가능합니다.");
+        return;
+      }
+      if (!selectedLeafNode || !selectedLeafNode.slides || selectedLeafNode.slides.length === 0) return;
+
+      const curSlide = selectedLeafNode.slides[currentSlideIdx];
+      if (!curSlide || !curSlide.rowIndex) return;
+
+      const slideName = curSlide.title || `${selectedLeafNode.title} (${currentSlideIdx + 1}P)`;
+      if (!confirm(`[관리자] 해당 슬라이드를 [${currentBookData.title}] 시트에서 삭제하시겠습니까?\n\n- 대상: ${slideName}`)) {
+        return;
+      }
+
+      stopTTS();
+      cancelInlineEdit();
+      const btn = document.getElementById("btnDeleteSlide");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin text-xs"></i>`;
+      }
+
+      try {
+        const res = await fetch(getActiveApiUrl(), {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "delete",
+            bookTitle: currentBookData.title,
+            rowIndex: curSlide.rowIndex
+          })
+        });
+
+        const rawText = await res.text();
+        let json = null;
+        try {
+          json = JSON.parse(rawText);
+        } catch (e) {
+          if (res.ok) json = { success: true };
+        }
+
+        if (json && json.success) {
+          alert("슬라이드가 삭제되었습니다.");
+          localStorage.removeItem(`CACHE_DATA_${selectedGenre}_${currentBookData.title}`);
+          loadBookData(currentBookData.title, true);
+        } else {
+          alert("삭제 실패: " + ((json && json.error) || "서버 응답 오류"));
+        }
+      } catch (err) {
+        alert("통신 오류: " + err.message);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = `<i class="fa-solid fa-trash-can text-[10px]"></i><span class="hidden sm:inline">삭제</span>`;
+        }
+      }
+    }
+
+    // 본문 블릿 및 문단 파싱 로직
+    function parseNotionTextIntoSlideBlocks(rawText, startOrder = 1) {
+      if (!rawText || !rawText.trim()) return [];
+
+      const lines = rawText.split(/\r?\n/);
+      const blocks = [];
+      let currentLines = [];
+      let inBulletSection = false;
+      let lastLineWasEmpty = false;
+
+      const isBulletLine = (str) => /^[•\-\*⁃]\s+/.test(str);
+      const isHeadingLine = (str) => /^#{1,4}\s+/.test(str);
+      const isCalloutOrDivider = (str) => /^([💡📌⚠️ℹ️🚨📝✅🔍🎯📖🌱🕊️]|(\-\-\-|\*\*\*|___))\s*/.test(str);
+
+      for (let i = 0; i < lines.length; i++) {
+        const rawLine = lines[i];
+        const trimmed = rawLine.trim();
+
+        if (!trimmed) {
+          if (inBulletSection && currentLines.length > 0) {
+            lastLineWasEmpty = true;
+          }
+          continue;
+        }
+
+        const isBullet = isBulletLine(trimmed);
+        const isHeading = isHeadingLine(trimmed);
+
+        if (!inBulletSection) {
+          if (isBullet) {
+            inBulletSection = true;
+            currentLines = [rawLine];
+            lastLineWasEmpty = false;
+          }
+        } else {
+          const isNewMajorBlock = isHeading || isCalloutOrDivider(trimmed) || (lastLineWasEmpty && !isBullet && !rawLine.startsWith(" ") && !rawLine.startsWith("\t"));
+          const isNewBulletBlockAfterGap = lastLineWasEmpty && isBullet;
+
+          if (isNewMajorBlock || isNewBulletBlockAfterGap) {
+            if (currentLines.length > 0) {
+              blocks.push(currentLines.join("\n").trim());
+              currentLines = [];
+            }
+
+            if (isBullet) {
+              inBulletSection = true;
+              currentLines.push(rawLine);
+            } else {
+              inBulletSection = false;
+            }
+          } else {
+            currentLines.push(rawLine);
+          }
+          lastLineWasEmpty = false;
+        }
+      }
+
+      if (currentLines.length > 0) {
+        blocks.push(currentLines.join("\n").trim());
+      }
+
+      if (blocks.length === 0 && rawText.trim()) {
+        blocks.push(rawText.trim());
+      }
+
+      return blocks.map((bodyText, idx) => ({
+        order: startOrder + idx,
+        body: bodyText
+      }));
+    }
+
+    function handleNotionBodyInput(text) {
+      const container = document.getElementById("parsedSlidesContainer");
+      const countBadge = document.getElementById("parsedSlideCountBadge");
+      const startOrderVal = parseInt(document.getElementById("inSlideOrder").value, 10) || 1;
+
+      parsedSlideList = parseNotionTextIntoSlideBlocks(text, startOrderVal);
+
+      if (countBadge) {
+        countBadge.textContent = `${parsedSlideList.length}개`;
+      }
+
+      if (!container) return;
+
+      if (parsedSlideList.length === 0) {
+        container.innerHTML = `
+          <div class="p-4 text-center text-stone-400 text-[11px] bg-white rounded-lg border border-stone-200">
+            글머리기호(•, -, * 등)를 포함한 본문을 입력하시면 순번별 슬라이드가 자동 구성됩니다.
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = "";
+      parsedSlideList.forEach(item => {
+        const itemBox = document.createElement("div");
+        itemBox.className = "p-2 bg-white rounded-lg border border-emerald-200 shadow-2xs space-y-1";
+        
+        const previewExcerpt = item.body.length > 120 ? item.body.substring(0, 120) + "..." : item.body;
+
+        itemBox.innerHTML = `
+          <div class="flex items-center justify-between text-[11px] font-bold text-emerald-800">
+            <span class="flex items-center gap-1">
+              <i class="fa-regular fa-clone text-emerald-600"></i> 슬라이드 순번 ${item.order}
+            </span>
+            <span class="text-[9px] px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">단일 셀 저장</span>
+          </div>
+          <div class="text-[11px] font-mono text-stone-600 whitespace-pre-wrap leading-relaxed bg-stone-50 p-1.5 rounded border border-stone-100">${escapeHtml(previewExcerpt)}</div>
+        `;
+        container.appendChild(itemBox);
+      });
+    }
+
+    function openAddDataModal() {
+      if (!isAdminLoggedIn) {
+        alert("슬라이드 등록은 관리자만 가능합니다.");
+        return;
+      }
+
+      const inBookTitle = document.getElementById("inBookTitle");
+      if (inBookTitle) inBookTitle.value = currentBookData.title || "";
+
+      const inAuthor = document.getElementById("inAuthor");
+      if (inAuthor) inAuthor.value = currentBookData.author || "";
+
+      const inCat = document.getElementById("inCategorySelect");
+      if (inCat) inCat.value = "content";
+
+      const inSlideTitle = document.getElementById("inSlideTitle");
+      if (inSlideTitle) inSlideTitle.value = "";
+
+      const inSlideBody = document.getElementById("inSlideBody");
+      if (inSlideBody) inSlideBody.value = "";
+
+      const progressStatus = document.getElementById("saveProgressStatus");
+      if (progressStatus) progressStatus.textContent = "";
+
+      parsedSlideList = [];
+      handleNotionBodyInput("");
+
+      onCategoryChange("content");
+      openModal("addDataModal");
+    }
+
+    async function submitRowToSheet() {
+      if (!isAdminLoggedIn) {
+        alert("관리자 권한이 필요합니다.");
+        return;
+      }
+
+      const cat = document.getElementById("inCategorySelect").value;
+      const bTitle = document.getElementById("inBookTitle").value.trim();
+      const author = document.getElementById("inAuthor").value.trim();
+
+      if (!bTitle) {
+        alert("도서명(워크시트명)을 입력해주세요.");
+        return;
+      }
+
+      let part = "", chapter = "", section = "", subsection = "";
+
+      if (cat === "content") {
+        part = document.getElementById("inPart").value.trim();
+        chapter = document.getElementById("inChapter").value.trim();
+        section = document.getElementById("inSection").value.trim();
+        subsection = document.getElementById("inSubsection").value.trim();
+
+        if (!part) {
+          alert("본문 등록 시 '편(Part)'은 필수입니다.");
+          return;
+        }
+      } else if (cat === "author") {
+        part = "지은이 소개"; chapter = "지은이"; section = "소개";
+      } else if (cat === "prologue") {
+        part = "프롤로그"; chapter = "프롤로그"; section = "머리말";
+      } else if (cat === "epilogue") {
+        part = "에필로그"; chapter = "에필로그"; section = "맺음말";
+      } else if (cat === "appendix") {
+        part = "부록"; chapter = "부록"; section = "참고자료";
+      }
+
+      const rawBody = document.getElementById("inSlideBody").value.trim();
+      const userEnteredTitle = document.getElementById("inSlideTitle").value.trim();
+      const startOrderVal = parseInt(document.getElementById("inSlideOrder").value, 10) || 1;
+
+      if (parsedSlideList.length === 0) {
+        parsedSlideList = parseNotionTextIntoSlideBlocks(rawBody, startOrderVal);
+      }
+
+      if (parsedSlideList.length === 0) {
+        alert("등록할 본문 내용이 없습니다. 노션 본문을 입력해주세요.");
+        return;
+      }
+
+      const btn = document.getElementById("btnSubmitRow");
+      const progressStatus = document.getElementById("saveProgressStatus");
+      if (btn) btn.disabled = true;
+
+      const totalSlides = parsedSlideList.length;
+      let successCount = 0;
+
+      for (let i = 0; i < totalSlides; i++) {
+        const slideItem = parsedSlideList[i];
+        
+        let slideTitle = userEnteredTitle;
+        if (userEnteredTitle && totalSlides > 1) {
+          slideTitle = `${userEnteredTitle} (${i + 1})`;
+        }
+
+        const payload = {
+          action: "create",
+          bookTitle: bTitle,
+          author: author || "저자 미상",
+          part: part,
+          chapter: chapter,
+          section: section,
+          subsection: subsection,
+          slideOrder: slideItem.order,
+          slideTitle: slideTitle,
+          slideBody: slideItem.body
+        };
+
+        if (progressStatus) {
+          progressStatus.textContent = `슬라이드 순번 ${slideItem.order} 저장 중... (${i + 1}/${totalSlides})`;
+        }
+        if (btn) {
+          btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> (${i + 1}/${totalSlides})`;
+        }
+
+        try {
+          const res = await fetch(getActiveApiUrl(), {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
+
+          const rawText = await res.text();
+          let json = null;
+          try {
+            json = JSON.parse(rawText);
+          } catch(e) {
+            if (res.ok && (rawText.includes("success") || rawText.includes("등록 완료"))) {
+              json = { success: true };
+            }
+          }
+
+          if (json && json.success) {
+            successCount++;
+          }
+        } catch (err) {
+          console.error(`순번 ${slideItem.order} 저장 오류:`, err);
+        }
+      }
+
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = `시트에 저장`;
+      }
+      if (progressStatus) progressStatus.textContent = "";
+
+      alert(`총 ${totalSlides}개의 슬라이드 중 ${successCount}개가 시트에 등록되었습니다.`);
+      closeModal("addDataModal");
+
+      localStorage.removeItem(`CACHE_LIST_${selectedGenre}`);
+      localStorage.removeItem(`CACHE_DATA_${selectedGenre}_${bTitle}`);
+
+      const targetLoc = {
+        cat: cat,
+        part: part,
+        chapter: chapter,
+        section: section,
+        subsection: subsection,
+        slideOrder: startOrderVal
+      };
+
+      if (!availableBookTitles.includes(bTitle)) {
+        loadBookList(0, bTitle, targetLoc);
+      } else {
+        loadBookData(bTitle, true, targetLoc);
+      }
+    }
+
+    // 자동 책갈피 기능 (열람한 마지막 슬라이드 이전 슬라이드 자동 저장)
+    function getStoredBookmarkForCurrentBook() {
+      if (!currentBookData.title) return null;
+      if (CURRENT_USER_ID) {
+        const cloudBm = cloudBookmarks[CURRENT_USER_ID] && cloudBookmarks[CURRENT_USER_ID][currentBookData.title];
+        if (cloudBm) return cloudBm;
+      }
+      try {
+        const localStr = localStorage.getItem(`LOCAL_AUTO_BOOKMARK_${selectedGenre}_${currentBookData.title}`);
+        return localStr ? JSON.parse(localStr) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function updateBookmarkButtonUI() {
+      const btn = document.getElementById("btnGoBookmark");
+      if (!btn) return;
+      const bm = getStoredBookmarkForCurrentBook();
+      if (bm && bm.nodeId) {
+        btn.title = `책갈피 이동: ${bm.nodeTitle || ''} (${(bm.slideIdx || 0) + 1}P)`;
+      } else {
+        btn.title = "자동 저장된 직전 책갈피로 이동";
+      }
+    }
+
+    function recordPreviousSlideBookmark(prevNode, prevSlideIdx) {
+      if (!prevNode || !currentBookData.title) return;
+      if (!prevNode.slides || prevNode.slides.length === 0) return;
+
+      const safeIdx = Math.max(0, Math.min(prevSlideIdx, prevNode.slides.length - 1));
+      const existing = getStoredBookmarkForCurrentBook();
+      if (existing && existing.nodeId === prevNode.id && existing.slideIdx === safeIdx) {
+        return;
+      }
+
+      const bmData = {
+        userId: CURRENT_USER_ID || "guest",
+        bookTitle: currentBookData.title,
+        nodeId: prevNode.id,
+        nodeTitle: prevNode.title,
+        slideIdx: safeIdx
+      };
+
+      // 로컬 즉시 저장 (비로그인 상태 포함)
+      try {
+        localStorage.setItem(`LOCAL_AUTO_BOOKMARK_${selectedGenre}_${currentBookData.title}`, JSON.stringify(bmData));
+      } catch (e) {}
+
+      // 회원 로그인 시 클라우드 캐시 및 시트 백그라운드 동기화
+      if (CURRENT_USER_ID) {
+        if (!cloudBookmarks[CURRENT_USER_ID]) cloudBookmarks[CURRENT_USER_ID] = {};
+        cloudBookmarks[CURRENT_USER_ID][currentBookData.title] = bmData;
+
+        const localKey = `CACHE_DATA_${selectedGenre}_${currentBookData.title}`;
+        const cached = localStorage.getItem(localKey);
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached);
+            parsed.bookmarks = cloudBookmarks;
+            localStorage.setItem(localKey, JSON.stringify(parsed));
+          } catch (e) {}
+        }
+
+        fetch(getActiveApiUrl(), {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            action: "save_bookmark",
+            userId: CURRENT_USER_ID,
+            bookTitle: currentBookData.title,
+            clear: false,
+            nodeId: prevNode.id,
+            nodeTitle: prevNode.title,
+            slideIdx: safeIdx
+          })
+        }).catch(err => console.error("자동 책갈피 동기화 오류:", err));
+      }
+
+      updateBookmarkButtonUI();
+    }
+
+    function goToBookmark() {
+      const userBm = getStoredBookmarkForCurrentBook();
+      if (!userBm || !userBm.nodeId) {
+        alert(`'${currentBookData.title || "현재 도서"}'에 자동 기록된 직전 책갈피가 없습니다.`);
+        return;
+      }
+
+      if (!currentBookData.tree) return;
+
+      function findNode(nodes, id) {
+        for (let n of nodes) {
+          if (n.id === id) return n;
+          if (n.children && n.children.length > 0) {
+            const res = findNode(n.children, id);
+            if (res) return res;
+          }
+        }
+        return null;
+      }
+
+      const targetNode = findNode(currentBookData.tree, userBm.nodeId);
+      if (targetNode) {
+        selectNode(targetNode, userBm.slideIdx || 0, true);
+      } else {
+        alert("책갈피가 지정된 항목을 찾을 수 없습니다.");
+      }
+    }
+
+    // 회원 및 관리자 계정 처리
+    function handleUserAuthClick() {
+      if (CURRENT_USER_ID) {
+        if (confirm(`현재 [회원 ${CURRENT_USER_ID}번]으로 로그인 중입니다.\n로그아웃하시겠습니까?`)) {
+          CURRENT_USER_ID = null;
+          localStorage.removeItem("BOOK_CURRENT_USER_ID");
+          updateUserLoginUI();
+          renderSlideViewer();
+          renderTree(currentBookData.tree);
+          updateOverallProgress();
+          alert("로그아웃되었습니다.");
+        }
+      } else {
+        openUserLoginModal();
+      }
+    }
+
+    function openUserLoginModal() {
+      const idInput = document.getElementById("loginUserId");
+      const pwInput = document.getElementById("loginUserPw");
+      if (idInput) idInput.value = "";
+      if (pwInput) pwInput.value = "";
+      openModal("userLoginModal");
+    }
+
+    function submitUserLogin() {
+      const idVal = document.getElementById("loginUserId").value.trim();
+      const pwVal = document.getElementById("loginUserPw").value.trim();
+
+      const num = parseInt(idVal, 10);
+      if (isNaN(num) || num < 1 || num > 100000) {
+        alert("회원 번호는 1부터 100,000 사이의 숫자여야 합니다.");
+        return;
+      }
+
+      if (idVal !== pwVal) {
+        alert("비밀번호는 회원 ID(일련번호)와 동일해야 합니다.");
+        return;
+      }
+
+      CURRENT_USER_ID = String(num);
+      localStorage.setItem("BOOK_CURRENT_USER_ID", CURRENT_USER_ID);
+      closeModal("userLoginModal");
+      updateUserLoginUI();
+
+      renderSlideViewer();
+      renderTree(currentBookData.tree);
+      updateOverallProgress();
+
+      alert(`회원 ${CURRENT_USER_ID}번으로 로그인되었습니다.`);
+    }
+
+    function updateUserLoginUI() {
+      const textElem = document.getElementById("userLoginText");
+      const btn = document.getElementById("btnUserLoginToggle");
+      if (!textElem || !btn) return;
+
+      if (CURRENT_USER_ID) {
+        textElem.textContent = `${CURRENT_USER_ID}번`;
+        btn.className = "px-2 py-1 text-[11px] font-bold rounded-lg border transition flex items-center gap-1 bg-indigo-600 text-white border-indigo-700 shadow-xs";
+        btn.title = `회원 ${CURRENT_USER_ID}번 로그인 중 (클릭 시 로그아웃)`;
+      } else {
+        textElem.textContent = "로그인";
+        btn.className = "px-2 py-1 text-[11px] font-bold rounded-lg border transition flex items-center gap-1 bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 shadow-xs";
+        btn.title = "회원 번호로 로그인";
+      }
+    }
+
+    function toggleAdminAuth() {
+      if (isAdminLoggedIn) {
+        if (confirm("관리자 모드에서 로그아웃하시겠습니까?")) {
+          isAdminLoggedIn = false;
+          cancelInlineEdit();
+          updateAdminUI();
+          alert("일반 뷰어 모드로 전환되었습니다.");
+        }
+      } else {
+        const inputPw = prompt("관리자 비밀번호를 입력해주세요 (기본: 1234):");
+        if (inputPw === null) return;
+        if (inputPw === ADMIN_PASSWORD) {
+          isAdminLoggedIn = true;
+          updateAdminUI();
+          alert("관리자 모드로 전환되었습니다. 슬라이드 등록, 수정, 삭제 기능이 활성화됩니다.");
+        } else {
+          alert("비밀번호가 일치하지 않습니다.");
+        }
+      }
+    }
+
+    function updateAdminUI() {
+      const lockIcon = document.getElementById("adminLockIcon");
+      const toggleText = document.getElementById("adminToggleText");
+      const toggleBtn = document.getElementById("btnAdminToggle");
+
+      const headerAddBtn = document.getElementById("btnHeaderAddSlide");
+      const editGroup = document.getElementById("editActionGroup");
+      const deleteBtn = document.getElementById("btnDeleteSlide");
+
+      if (isAdminLoggedIn) {
+        lockIcon.className = "fa-solid fa-lock-open text-emerald-600 text-[10px]";
+        toggleText.textContent = "ON";
+        toggleBtn.className = "p-1.5 sm:px-2 sm:py-1 text-[11px] font-bold rounded-lg border transition flex items-center gap-1 bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100 shadow-xs";
+        
+        if (headerAddBtn) {
+          headerAddBtn.classList.remove("hidden");
+          headerAddBtn.classList.add("flex");
+        }
+        if (editGroup) {
+          editGroup.classList.remove("hidden");
+          editGroup.classList.add("flex");
+        }
+        if (deleteBtn && selectedLeafNode && selectedLeafNode.slides && selectedLeafNode.slides.length > 0) {
+          deleteBtn.classList.remove("hidden");
+          deleteBtn.classList.add("flex");
+        }
+      } else {
+        lockIcon.className = "fa-solid fa-lock text-[10px]";
+        toggleText.textContent = "관리자";
+        toggleBtn.className = "p-1.5 sm:px-2 sm:py-1 text-[11px] font-semibold rounded-lg border transition flex items-center gap-1 bg-stone-100 text-stone-600 border-stone-200 hover:bg-stone-200";
+
+        if (headerAddBtn) headerAddBtn.classList.add("hidden");
+        if (editGroup) editGroup.classList.add("hidden");
+        if (deleteBtn) deleteBtn.classList.add("hidden");
+      }
+    }
+
+    // TTS 음성 변환 로직
+    function convertNumberToSinoKorean(numStr) {
+      const num = parseInt(numStr, 10);
+      if (isNaN(num)) return numStr;
+      if (num === 0) return "영";
+
+      const digits = ["", "일", "이", "삼", "사", "오", "육", "칠", "팔", "구"];
+      const smallUnits = ["", "십", "백", "천"];
+      const bigUnits = ["", "만", "억", "조"];
+
+      let result = "";
+      let s = String(num);
+      let len = s.length;
+      let chunkCount = Math.ceil(len / 4);
+
+      for (let i = 0; i < chunkCount; i++) {
+        let chunkEnd = len - i * 4;
+        let chunkStart = Math.max(0, chunkEnd - 4);
+        let chunk = s.substring(chunkStart, chunkEnd);
+        let chunkStr = "";
+        let chunkLen = chunk.length;
+
+        for (let j = 0; j < chunkLen; j++) {
+          let d = parseInt(chunk[j], 10);
+          let unitPos = chunkLen - j - 1;
+          if (d !== 0) {
+            if (d === 1 && unitPos > 0) {
+              chunkStr += smallUnits[unitPos];
+            } else {
+              chunkStr += digits[d] + smallUnits[unitPos];
             }
           }
         }
 
-        if (viewsObj && typeof viewsObj === 'object' && !Array.isArray(viewsObj)) {
-          viewCount = Number(viewsObj[currentPart]) || 0;
-        } else if (typeof viewsObj === 'number') {
-          viewCount = viewsObj;
+        if (chunkStr !== "") {
+          result = chunkStr + bigUnits[i] + " " + result;
         }
-        // ------------------------------
-
-        // 지난 날짜 스타일링 (다소 연하게 표시)
-        const pastContainerClass = past ? "opacity-65 bg-slate-50/50" : "";
-        const pastBadgeClass = past ? "!bg-slate-100 !text-slate-500 !border-slate-200" : theme.badge;
-        const pastTextClass = past ? "!text-slate-600" : "text-slate-800";
-
-        if (hasLink) {
-          return `
-            <div 
-              onclick="openSongLink('${song.id}', '${link}', '${currentPart}')"
-              class="flex items-center justify-between gap-3.5 px-5 py-3.5 ${theme.hover} active:bg-slate-100/70 transition duration-150 group cursor-pointer ${pastContainerClass}"
-            >
-              <div class="flex items-center gap-3 min-w-0 flex-1">
-                <span class="text-xs font-bold ${pastBadgeClass} px-2.5 py-1 rounded-lg border shrink-0 transition">
-                  ${formatDate(song.date)}
-                </span>
-                <span class="text-sm sm:text-base font-semibold ${pastTextClass} ${theme.hover} truncate">
-                  ${song.title}
-                </span>
-              </div>
-              
-              <div class="flex items-center gap-3 shrink-0">
-                <span class="flex items-center gap-1 text-xs text-slate-400 group-hover:text-slate-500 font-medium">
-                  <i data-lucide="headphones" class="w-3.5 h-3.5"></i>
-                  <span id="views-${song.id}">${viewCount}</span>
-                </span>
-                <div class="w-7 h-7 rounded-full flex items-center justify-center text-slate-300 ${theme.icon} transition">
-                  <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
-                </div>
-              </div>
-            </div>
-          `;
-        } else {
-          return `
-            <div class="flex items-center justify-between gap-3.5 px-5 py-3.5 bg-slate-50/40 opacity-40 cursor-not-allowed">
-              <div class="flex items-center gap-3 min-w-0 flex-1">
-                <span class="text-xs font-semibold text-slate-500 bg-slate-200/60 px-2.5 py-1 rounded-lg shrink-0">
-                  ${formatDate(song.date)}
-                </span>
-                <span class="text-sm sm:text-base font-medium text-slate-500 truncate">
-                  ${song.title}
-                </span>
-              </div>
-              <div class="flex items-center gap-3 shrink-0">
-                <span class="flex items-center gap-1 text-xs text-slate-400 font-medium">
-                  <i data-lucide="headphones" class="w-3.5 h-3.5"></i>
-                  <span>${viewCount}</span>
-                </span>
-                <span class="text-[11px] text-slate-400 px-2 py-0.5 bg-slate-200/50 rounded">준비중</span>
-              </div>
-            </div>
-          `;
-        }
-      }).join('');
-
-      lucide.createIcons();
-    }
-
-    function formatDate(dateInput) {
-      if (!dateInput) return '';
-      const d = new Date(dateInput);
-      if (!isNaN(d.getTime())) {
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        return `${month}.${day}`;
       }
-      return String(dateInput).replace(/-/g, '.');
+
+      return result.trim();
     }
 
-    function openSongModal() {
-      const modal = document.getElementById('songModal');
-      const content = document.getElementById('songModalContent');
-      document.getElementById('songForm').reset();
-      
-      const now = new Date();
-      const localDate = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-      document.getElementById('songDate').value = localDate;
-      
-      modal.classList.remove('hidden');
-      setTimeout(() => {
-        modal.classList.remove('opacity-0');
-        content.classList.remove('translate-y-8', 'sm:scale-95');
-      }, 10);
+    function convertDecimalToSinoKorean(decStr) {
+      const digitMap = { '0': '영', '1': '일', '2': '이', '3': '삼', '4': '사', '5': '오', '6': '육', '7': '칠', '8': '팔', '9': '구' };
+      if (decStr.includes('.')) {
+        const parts = decStr.split('.');
+        const intPart = convertNumberToSinoKorean(parts[0]);
+        const decimalPart = parts[1].split('').map(d => digitMap[d] || d).join('');
+        return `${intPart}점${decimalPart}`;
+      }
+      return convertNumberToSinoKorean(decStr);
     }
 
-    function closeSongModal() {
-      const modal = document.getElementById('songModal');
-      const content = document.getElementById('songModalContent');
-      modal.classList.add('opacity-0');
-      content.classList.add('translate-y-8', 'sm:scale-95');
-      setTimeout(() => {
-        modal.classList.add('hidden');
-      }, 200);
+    function cleanTextForSpeech(raw) {
+      if (!raw) return "";
+
+      let lines = raw.split(/\r?\n/);
+      lines = lines.map(line => {
+        let l = line.trim();
+        if (!l) return "";
+        if (!/[.,!?;:~]$/.test(l)) {
+          l += ", ";
+        }
+        return l;
+      });
+      let t = lines.filter(Boolean).join(" ");
+
+      // A.D., B.C., U.S.A. 등 알파벳 약어 중간/끝의 마침표 제거 (점 발음 생략 -> AD, BC, USA)
+      t = t.replace(/([A-Za-z])\.(?=[A-Za-z])/g, "$1");
+      t = t.replace(/\b([A-Za-z]{2,})\.(?=\s|$|[^A-Za-z0-9])/g, "$1");
+
+      t = t.replace(/```[\s\S]*?```/g, " ");
+      t = t.replace(/[()（）]/g, " ");
+      t = t.replace(/\[[^\]]*\]/g, " ");
+      t = t.replace(/%/g, " 퍼센트 ");
+      t = t.replace(/[\/\\—–―~|&_]/g, " ");
+      t = t.replace(/[-]/g, " ");
+      t = t.replace(/^#+\s+/gm, "");
+      t = t.replace(/\*\*(.*?)\*\*/g, "$1");
+      t = t.replace(/\*(.*?)\*/g, "$1");
+      t = t.replace(/~~(.*?)~~/g, "$1");
+      t = t.replace(/==(.*?)==/g, "$1");
+      t = t.replace(/`([^`]+)`/g, "$1");
+      t = t.replace(/^[•*]\s+/gm, "");
+      t = t.replace(/\$\\rightarrow\$/g, "에서");
+      t = t.replace(/\\rightarrow/g, "에서");
+      t = t.replace(/[→➔➜]/g, "에서");
+      t = t.replace(/^>\s+/gm, "");
+      t = t.replace(/^[💡📌⚠️ℹ️🚨📝✅🔍🎯📖🌱🕊️]\s*/gm, "");
+
+      t = t.replace(/(\d+),(\d+)/g, "$1$2");
+
+      const unitKoreanMap = {
+        "km": "킬로미터",
+        "m": "미터",
+        "cm": "센티미터",
+        "mm": "밀리미터",
+        "kg": "킬로그램",
+        "g": "그램",
+        "mg": "밀리그램",
+        "l": "리터",
+        "ml": "밀리리터",
+        "m²": "제곱미터",
+        "km²": "제곱킬로미터"
+      };
+
+      const unitPattern = /(\d+(?:\.\d+)?)\s*(km²|m²|km|cm|mm|kg|mg|ml|m|g|l|킬로미터|미터|센티미터|밀리미터|킬로그램|킬로그람|그램|밀리그램|리터|밀리리터|톤|평)(?![a-zA-Z가-힣])/gi;
+      t = t.replace(unitPattern, (match, pNum, pUnit) => {
+        const lowerUnit = pUnit.toLowerCase();
+        const korUnit = unitKoreanMap[lowerUnit] || pUnit;
+        return convertDecimalToSinoKorean(pNum) + " " + korUnit;
+      });
+
+      t = t.replace(/\d+/g, (match) => convertNumberToSinoKorean(match));
+      t = t.replace(/\s+/g, " ");
+      return t.trim();
     }
 
-    async function saveSong(e) {
-      e.preventDefault();
-      const submitBtn = document.getElementById('submitBtn');
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>저장 중...</span>`;
-      lucide.createIcons();
+    function splitTextByLanguage(text) {
+      const regex = /([A-Za-z][A-Za-z\s']*)/g;
+      const segments = [];
+      let lastIndex = 0;
+      let match;
 
-      const newSong = {
-        id: Date.now().toString(),
-        date: document.getElementById('songDate').value,
-        title: document.getElementById('songTitle').value.trim(),
-        links: {
-          all: document.getElementById('linkAll').value.trim(),
-          soprano: document.getElementById('linkSoprano').value.trim(),
-          alto: document.getElementById('linkAlto').value.trim(),
-          tenor: document.getElementById('linkTenor').value.trim(),
-          bass: document.getElementById('linkBass').value.trim()
-        },
-        views: {
-          all: 0,
-          soprano: 0,
-          alto: 0,
-          tenor: 0,
-          bass: 0
+      while ((match = regex.exec(text)) !== null) {
+        if (match.index > lastIndex) {
+          const koPart = text.slice(lastIndex, match.index).trim();
+          if (koPart) segments.push({ lang: "ko-KR", text: koPart });
+        }
+        const enPart = match[0].trim();
+        if (enPart) segments.push({ lang: "en-US", text: enPart });
+        lastIndex = regex.lastIndex;
+      }
+
+      if (lastIndex < text.length) {
+        const koPart = text.slice(lastIndex).trim();
+        if (koPart) segments.push({ lang: "ko-KR", text: koPart });
+      }
+
+      return segments;
+    }
+
+    function getUsEnglishVoice(synth) {
+      const voices = synth.getVoices();
+      return (
+        voices.find(v => v.lang === "en-US" && v.name.includes("Google")) ||
+        voices.find(v => v.lang === "en-US" || v.lang === "en_US") ||
+        voices.find(v => v.lang.startsWith("en"))
+      );
+    }
+
+    let ttsSegments = [];
+    let currentSegmentIndex = 0;
+
+    // 현재 읽고 있는 라인 강조 해제 및 적용 헬퍼
+    function clearTTSHighlight() {
+      document.querySelectorAll('.tts-active-line').forEach(el => {
+        el.classList.remove('tts-active-line');
+      });
+    }
+
+    function highlightTTSLine(lineTarget) {
+      clearTTSHighlight();
+      if (lineTarget === null || lineTarget === undefined) return;
+
+      let el = null;
+      if (lineTarget === 'title') {
+        el = document.getElementById('slideTitle');
+      } else {
+        el = document.querySelector(`[data-tts-line="${lineTarget}"]`);
+      }
+
+      if (el) {
+        el.classList.add('tts-active-line');
+        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    // 현재 슬라이드 인덱스(currentSlideIdx)의 텍스트를 라인 단위 세그먼트로 구성해 TTS 읽기 시작
+    function startReadingCurrentSlide(includeNodeTitle = true) {
+      const synth = window.speechSynthesis;
+      if (!selectedLeafNode || !selectedLeafNode.slides || !selectedLeafNode.slides[currentSlideIdx]) {
+        stopTTS();
+        return;
+      }
+
+      const cur = selectedLeafNode.slides[currentSlideIdx];
+      const segments = [];
+
+      // 1. 제목 세그먼트 구성
+      const hasVisibleCustomTitle = cur.title && cur.title.trim() !== "" && cur.title.trim() !== selectedLeafNode.title.trim();
+      const rawTitle = includeNodeTitle ? (cur.title || selectedLeafNode.title || "") : (cur.title || "");
+      const titleToRead = cleanTextForSpeech(rawTitle);
+
+      if (titleToRead) {
+        const titleLangSegs = splitTextByLanguage(titleToRead);
+        titleLangSegs.forEach(s => {
+          segments.push({
+            lang: s.lang,
+            text: s.text,
+            lineTarget: hasVisibleCustomTitle ? 'title' : null
+          });
+        });
+      }
+
+      // 2. 본문 라인별 세그먼트 구성 (코드블록 내부 제외, 렌더링된 data-tts-line 인덱스와 1:1 매칭)
+      const bodyLines = (cur.body || "").split('\n');
+      let inCodeBlock = false;
+      bodyLines.forEach((rawLine, lineIdx) => {
+        const trimmed = rawLine.trim();
+        if (trimmed.startsWith("```")) {
+          inCodeBlock = !inCodeBlock;
+          return;
+        }
+        if (inCodeBlock || !trimmed || /^(\-\-\-|\*\*\*|___)$/.test(trimmed)) {
+          return;
+        }
+
+        const cleanedLine = cleanTextForSpeech(trimmed);
+        if (cleanedLine) {
+          const langSegs = splitTextByLanguage(cleanedLine);
+          langSegs.forEach(s => {
+            segments.push({
+              lang: s.lang,
+              text: s.text,
+              lineTarget: lineIdx
+            });
+          });
+        }
+      });
+
+      // 현재 슬라이드에 읽을 텍스트가 비어있는 경우 다음 슬라이드로 자동 이동 처리
+      if (segments.length === 0) {
+        if (currentSlideIdx < selectedLeafNode.slides.length - 1) {
+          recordPreviousSlideBookmark(selectedLeafNode, currentSlideIdx);
+          currentSlideIdx++;
+          renderSlideViewer();
+          startReadingCurrentSlide(false);
+        } else {
+          stopTTS();
+        }
+        return;
+      }
+
+      synth.cancel();
+      ttsSegments = segments;
+      currentSegmentIndex = 0;
+      isTTSPlaying = true;
+      isTTSPaused = false;
+      updateTTSButtonUI(true);
+
+      speakNextSegment();
+    }
+
+    function toggleTTS() {
+      if (!('speechSynthesis' in window)) {
+        alert("브라우저가 TTS 기능을 지원하지 않습니다.");
+        return;
+      }
+
+      const synth = window.speechSynthesis;
+
+      if (isTTSPaused) {
+        synth.resume();
+        isTTSPaused = false;
+        isTTSPlaying = true;
+        updateTTSButtonUI(true);
+        return;
+      }
+
+      if (isTTSPlaying) {
+        synth.pause();
+        isTTSPaused = true;
+        isTTSPlaying = false;
+        updateTTSButtonUI(false, true);
+        return;
+      }
+
+      if (!selectedLeafNode || !selectedLeafNode.slides || selectedLeafNode.slides.length === 0) {
+        alert("읽을 슬라이드 내용이 없습니다.");
+        return;
+      }
+
+      // 처음 재생을 누른 슬라이드부터 해당 목차의 끝까지 순차 낭독 시작
+      startReadingCurrentSlide(true);
+    }
+
+    function speakNextSegment() {
+      const synth = window.speechSynthesis;
+
+      // 현재 슬라이드의 모든 문장(세그먼트)을 다 읽었을 때
+      if (currentSegmentIndex >= ttsSegments.length) {
+        clearTTSHighlight();
+
+        // 같은 목차 내에 다음 슬라이드가 남아있다면 자동으로 슬라이드 이동 후 연속 낭독
+        if (
+          isTTSPlaying &&
+          selectedLeafNode &&
+          selectedLeafNode.slides &&
+          currentSlideIdx < selectedLeafNode.slides.length - 1
+        ) {
+          recordPreviousSlideBookmark(selectedLeafNode, currentSlideIdx);
+          currentSlideIdx++;
+          renderSlideViewer();
+
+          // 화면 전환 직후 자연스러운 텀(0.4초)을 두고 다음 슬라이드 낭독 시작
+          setTimeout(() => {
+            if (isTTSPlaying) {
+              startReadingCurrentSlide(false);
+            }
+          }, 400);
+          return;
+        }
+
+        // 현재 목차의 맨 마지막 슬라이드까지 모두 읽었으므로 음성 읽기 종료
+        stopTTS();
+        return;
+      }
+
+      const seg = ttsSegments[currentSegmentIndex];
+      ttsUtterance = new SpeechSynthesisUtterance(seg.text);
+      ttsUtterance.lang = seg.lang;
+      ttsUtterance.rate = 1.0;
+      ttsUtterance.pitch = 1.0;
+
+      if (seg.lang === "en-US") {
+        const usVoice = getUsEnglishVoice(synth);
+        if (usVoice) ttsUtterance.voice = usVoice;
+      }
+
+      ttsUtterance.onstart = () => {
+        isTTSPlaying = true;
+        isTTSPaused = false;
+        updateTTSButtonUI(true);
+        highlightTTSLine(seg.lineTarget);
+      };
+
+      ttsUtterance.onend = () => {
+        if (isTTSPlaying) {
+          currentSegmentIndex++;
+          speakNextSegment();
         }
       };
 
-      try {
-        await fetch(SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...newSong,
-            action: 'add_song'
-          })
-        });
-
-        songs.push(newSong);
-        localStorage.setItem(CACHE_KEY, JSON.stringify(songs));
-        
-        if (currentPart) {
-          renderSongList();
+      ttsUtterance.onerror = (e) => {
+        if (e.error !== "interrupted" && e.error !== "canceled") {
+          console.error("TTS 에러:", e);
         }
-        closeSongModal();
-      } catch (err) {
-        console.error(err);
-        alert('저장 중 문제가 발생했습니다. 스프레드시트 상태를 확인해주세요.');
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `<span>저장하기</span>`;
+        clearTTSHighlight();
+        isTTSPlaying = false;
+        isTTSPaused = false;
+        updateTTSButtonUI(false);
+      };
+
+      synth.speak(ttsUtterance);
+    }
+
+    function stopTTS() {
+      isTTSPlaying = false;
+      isTTSPaused = false;
+      ttsSegments = [];
+      currentSegmentIndex = 0;
+      clearTTSHighlight();
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      updateTTSButtonUI(false);
+    }
+
+    function updateTTSButtonUI(playing, paused = false) {
+      const icon = document.getElementById("ttsPlayIcon");
+      const text = document.getElementById("ttsStatusText");
+      const btn = document.getElementById("btnTTSPlay");
+      if (!icon || !btn) return;
+
+      if (playing) {
+        icon.className = "fa-solid fa-pause text-amber-600 animate-pulse text-xs";
+        if (text) text.textContent = "일시정지";
+        btn.title = "일시정지";
+      } else if (paused) {
+        icon.className = "fa-solid fa-play text-emerald-600 text-xs";
+        if (text) text.textContent = "이어듣기";
+        btn.title = "이어듣기";
+      } else {
+        icon.className = "fa-solid fa-volume-high text-emerald-600 text-xs";
+        if (text) text.textContent = "읽기";
+        btn.title = "본문 듣기";
       }
     }
+
+    function renderNotionFormattedText(raw) {
+      if (!raw) return "<p class='text-stone-400 italic text-xs'>내용이 없습니다.</p>";
+
+      const lines = raw.split('\n');
+      let html = "";
+      let inCodeBlock = false;
+      let codeBuffer = "";
+
+      const bulletStyles = [
+        { icon: '<i class="fa-solid fa-circle text-[5.5px] text-emerald-700"></i>', color: "text-stone-900 font-medium" },
+        { icon: '<i class="fa-regular fa-circle text-[5.5px] text-teal-700"></i>', color: "text-stone-800" },
+        { icon: '<i class="fa-solid fa-square text-[4.5px] text-amber-700"></i>', color: "text-stone-700" },
+        { icon: '<i class="fa-solid fa-minus text-[6px] text-stone-400"></i>', color: "text-stone-600" }
+      ];
+
+      lines.forEach((line, lineIdx) => {
+        if (line.trim().startsWith("```")) {
+          if (!inCodeBlock) {
+            inCodeBlock = true;
+            codeBuffer = "";
+          } else {
+            inCodeBlock = false;
+            html += `<pre class="notion-code"><code>${escapeHtml(codeBuffer)}</code></pre>`;
+          }
+          return;
+        }
+
+        if (inCodeBlock) {
+          codeBuffer += line + "\n";
+          return;
+        }
+
+        if (!line.trim()) {
+          html += "<div class='h-2'></div>";
+          return;
+        }
+
+        const leadingWhitespaceMatch = line.match(/^[\t ]*/)[0];
+        let indentLevel = 0;
+        for (let ch of leadingWhitespaceMatch) {
+          if (ch === '\t') indentLevel += 1;
+          else if (ch === ' ') indentLevel += 0.5;
+        }
+        indentLevel = Math.min(Math.floor(indentLevel), 4);
+        const indentPaddingPx = indentLevel * (window.innerWidth < 768 ? 10 : 16);
+
+        const trimmed = line.trim();
+
+        if (/^(\-\-\-|\*\*\*|___)$/.test(trimmed)) {
+          html += `<hr class="notion-hr" />`;
+          return;
+        }
+
+        if (trimmed.startsWith("### ")) {
+          html += `<h4 data-tts-line="${lineIdx}" class="tts-line-block px-1 notion-h3" style="margin-left: ${indentPaddingPx}px">${parseInline(trimmed.substring(4).trim())}</h4>`;
+          return;
+        }
+        if (trimmed.startsWith("## ")) {
+          html += `<h3 data-tts-line="${lineIdx}" class="tts-line-block px-1 notion-h2" style="margin-left: ${indentPaddingPx}px">${parseInline(trimmed.substring(3).trim())}</h3>`;
+          return;
+        }
+        if (trimmed.startsWith("# ")) {
+          html += `<h2 data-tts-line="${lineIdx}" class="tts-line-block px-1 notion-h1" style="margin-left: ${indentPaddingPx}px">${parseInline(trimmed.substring(2).trim())}</h2>`;
+          return;
+        }
+
+        const calloutMatch = trimmed.match(/^([💡📌⚠️ℹ️🚨📝✅🔍🎯📖🌱🕊️])\s*(.*)/);
+        if (calloutMatch) {
+          html += `<div data-tts-line="${lineIdx}" class="tts-line-block notion-callout flex items-start gap-2.5" style="margin-left: ${indentPaddingPx}px">
+            <span class="text-base flex-shrink-0">${calloutMatch[1]}</span>
+            <div class="flex-1 font-normal text-stone-800">${parseInline(calloutMatch[2])}</div>
+          </div>`;
+          return;
+        }
+
+        if (trimmed.startsWith(">")) {
+          html += `<blockquote data-tts-line="${lineIdx}" class="tts-line-block notion-quote" style="margin-left: ${indentPaddingPx}px">${parseInline(trimmed.substring(1).trim())}</blockquote>`;
+          return;
+        }
+
+        if (trimmed.startsWith("[ ] ") || trimmed.startsWith("[x] ")) {
+          const isChecked = trimmed.startsWith("[x] ");
+          const text = trimmed.substring(4);
+          html += `<div data-tts-line="${lineIdx}" class="tts-line-block px-1 flex items-center gap-1.5 my-1 pl-0.5" style="margin-left: ${indentPaddingPx}px">
+            <input type="checkbox" ${isChecked ? 'checked' : ''} disabled class="w-3.5 h-3.5 rounded text-emerald-700">
+            <span class="${isChecked ? 'line-through text-stone-400' : 'text-stone-800'}">${parseInline(text)}</span>
+          </div>`;
+          return;
+        }
+
+        if (trimmed.startsWith("•") || trimmed.startsWith("- ") || trimmed.startsWith("* ")) {
+          const content = trimmed.replace(/^[•\-\*]\s*/, "");
+          const style = bulletStyles[Math.min(indentLevel, bulletStyles.length - 1)];
+
+          html += `<div data-tts-line="${lineIdx}" class="tts-line-block px-1 flex items-start gap-2 my-1" style="margin-left: ${indentPaddingPx}px">
+            <span class="flex items-center justify-center w-2.5 h-5 flex-shrink-0 mt-0.5">
+              ${style.icon}
+            </span>
+            <p class="flex-1 leading-[1.8] ${style.color}">${parseInline(content)}</p>
+          </div>`;
+          return;
+        }
+
+        const numMatch = trimmed.match(/^(\d+)\.\s+(.*)/);
+        if (numMatch) {
+          const numBadgeColor = indentLevel === 0 ? "bg-[#efe9dc] text-stone-800 font-bold" : "bg-[#f4efe6] text-stone-600 text-[10px]";
+          html += `<div data-tts-line="${lineIdx}" class="tts-line-block px-1 flex items-start gap-2 my-1" style="margin-left: ${indentPaddingPx}px">
+            <span class="flex-shrink-0 ${numBadgeColor} px-1.5 py-0.2 rounded border border-[#dcd3c1] mt-1 text-[10px]">${numMatch[1]}</span>
+            <p class="flex-1 leading-[1.8] text-stone-800">${parseInline(numMatch[2])}</p>
+          </div>`;
+          return;
+        }
+
+        html += `<p data-tts-line="${lineIdx}" class="tts-line-block px-1 leading-[1.8] mb-1.5 font-normal text-stone-800" style="margin-left: ${indentPaddingPx}px">${parseInline(trimmed)}</p>`;
+      });
+
+      return html;
+    }
+
+    function parseInline(text) {
+      let t = escapeHtml(text);
+      t = t.replace(/\$\\rightarrow\$/g, '-&gt;');
+      t = t.replace(/\\rightarrow/g, '-&gt;');
+      t = t.replace(/[→➔➜]/g, '-&gt;');
+      t = t.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-stone-950">$1</strong>');
+      t = t.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
+      t = t.replace(/~~(.*?)~~/g, '<del class="line-through text-stone-400">$1</del>');
+      t = t.replace(/==(.*?)==/g, '<mark class="notion-highlight">$1</mark>');
+      t = t.replace(/`([^`]+)`/g, '<code class="notion-inline-code">$1</code>');
+      return t;
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    function getFlattenedSlideNodes() {
+      if (!currentBookData.tree) return [];
+      const list = [];
+      function traverse(nodes) {
+        for (let n of nodes) {
+          if (n.slides && n.slides.length > 0) list.push(n);
+          if (n.children && n.children.length > 0) traverse(n.children);
+        }
+      }
+      traverse(currentBookData.tree);
+      return list;
+    }
+
+    function getNodeAncestors(targetId) {
+      if (!currentBookData.tree) return [];
+      function search(nodes, path) {
+        for (let n of nodes) {
+          if (n.id === targetId) return path;
+          if (n.children && n.children.length > 0) {
+            const found = search(n.children, [...path, n]);
+            if (found) return found;
+          }
+        }
+        return null;
+      }
+      return search(currentBookData.tree, []) || [];
+    }
+
+    function filterTreeSearch(query) {
+      const q = query.trim().toLowerCase();
+      if (!currentBookData.tree) return;
+
+      if (!q) {
+        renderTree(currentBookData.tree);
+        return;
+      }
+
+      function filterNode(node) {
+        const titleMatch = node.title.toLowerCase().includes(q);
+        const slideMatch = node.slides && node.slides.some(s => 
+          (s.title && s.title.toLowerCase().includes(q)) || 
+          (s.body && s.body.toLowerCase().includes(q))
+        );
+
+        let filteredChildren = [];
+        if (node.children) {
+          filteredChildren = node.children.map(filterNode).filter(Boolean);
+        }
+
+        if (titleMatch || slideMatch || filteredChildren.length > 0) {
+          return { ...node, _collapsed: false, children: filteredChildren };
+        }
+        return null;
+      }
+
+      const filtered = currentBookData.tree.map(filterNode).filter(Boolean);
+      renderTree(filtered);
+    }
+
+    function toggleAllNodes(collapse) {
+      if (!currentBookData.tree) return;
+      function setCol(nodes) {
+        nodes.forEach(n => {
+          n._collapsed = collapse;
+          if (n.children) setCol(n.children);
+        });
+      }
+      setCol(currentBookData.tree);
+      renderTree(currentBookData.tree);
+    }
+
+    function setupSwipeGesture() {
+      const touchArea = document.getElementById("slideTouchArea");
+      if (!touchArea) return;
+      let touchStartX = 0;
+      let touchStartY = 0;
+
+      touchArea.addEventListener('touchstart', (e) => {
+        if (isInlineEditing) return;
+        touchStartX = e.changedTouches[0].screenX;
+        touchStartY = e.changedTouches[0].screenY;
+      }, { passive: true });
+
+      touchArea.addEventListener('touchend', (e) => {
+        if (isInlineEditing) return;
+        const touchEndX = e.changedTouches[0].screenX;
+        const touchEndY = e.changedTouches[0].screenY;
+        const diffX = touchEndX - touchStartX;
+        const diffY = touchEndY - touchStartY;
+
+        if (Math.abs(diffX) > Math.abs(diffY) * 1.5 && Math.abs(diffX) > 40) {
+          if (diffX > 0) navigateSlide(-1);
+          else navigateSlide(1);
+        }
+      }, { passive: true });
+    }
+
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById("mainSidebar");
+      const backdrop = document.getElementById("mobileBackdrop");
+      if (!sidebar || !backdrop) return;
+      const isClosed = sidebar.classList.contains("-translate-x-full");
+
+      if (isClosed) {
+        sidebar.classList.remove("-translate-x-full");
+        backdrop.classList.remove("hidden");
+      } else {
+        sidebar.classList.add("-translate-x-full");
+        backdrop.classList.add("hidden");
+      }
+    }
+
+    function onCategoryChange(cat) {
+      const hierarchyFields = document.getElementById("contentHierarchyFields");
+      if (hierarchyFields) {
+        if (cat === "content") hierarchyFields.classList.remove("hidden");
+        else hierarchyFields.classList.add("hidden");
+      }
+    }
+
+    function openModal(id) { 
+      const el = document.getElementById(id);
+      if (el) el.classList.remove("hidden"); 
+    }
+    function closeModal(id) { 
+      const el = document.getElementById(id);
+      if (el) el.classList.add("hidden"); 
+    }
+
+    function openApiSettingModal() {
+      const genreText = document.getElementById("modalCurrentGenreText");
+      if (genreText) genreText.textContent = selectedGenre ? `${selectedGenre} (URL: ${getActiveApiUrl().substring(0, 42)}...)` : "분야 미선택";
+      const pwInput = document.getElementById("adminPasswordInput");
+      if (pwInput) pwInput.value = ADMIN_PASSWORD;
+      openModal("apiSettingModal");
+    }
+
+    function saveAdminPwSetting() {
+      const pwInput = document.getElementById("adminPasswordInput");
+      const newPw = pwInput ? pwInput.value.trim() : "";
+      if (newPw) {
+        ADMIN_PASSWORD = newPw;
+        localStorage.setItem("BOOK_ADMIN_PW", newPw);
+      }
+      closeModal("apiSettingModal");
+      alert("관리자 비밀번호가 저장되었습니다.");
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeModal("bookSearchModal");
+        closeModal("addDataModal");
+        closeModal("apiSettingModal");
+        closeModal("userLoginModal");
+      }
+      const tag = document.activeElement.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (e.key === "ArrowLeft") navigateSlide(-1);
+      if (e.key === "ArrowRight") navigateSlide(1);
+    });
+
+    window.addEventListener("DOMContentLoaded", () => {
+      initGenreDropdown();
+      updateUserLoginUI();
+      setupSwipeGesture();
+      updateAdminUI();
+    });
   </script>
 </body>
 </html>
